@@ -5,6 +5,7 @@ import providerRouter from "./routes/ProviderRoutes.js";
 import serviceRouter from "./routes/ServiceRoutes.js";
 import bookingRouter from "./routes/BookingRoutes.js";
 import reviewRouter from "./routes/ReviewRoutes.js";
+import paymentRouter from "./routes/PaymentRoutes.js";
 
 // Initialized express
 const app = express();
@@ -24,6 +25,7 @@ app.use("/c2c/providers/", providerRouter);
 app.use("/c2c/services/", serviceRouter);
 app.use("/c2c/bookings/", bookingRouter);
 app.use("/c2c/reviews/", reviewRouter);
+app.use("/c2c/payments/", paymentRouter);
 
 const PORT = 3000;
 app.listen(PORT, () => {
