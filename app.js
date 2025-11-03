@@ -2,6 +2,7 @@ import express from "express";
 import connectDB from "./config/db.js";
 import userRouter from "./routes/AuthRoutes.js";
 import providerRouter from "./routes/ProviderRoutes.js";
+import serviceRouter from "./routes/ServiceRoutes.js";
 
 // Initialized express
 const app = express();
@@ -18,6 +19,7 @@ connectDB();
 //Routes
 app.use("/c2c/users/", userRouter);
 app.use("/c2c/providers/", providerRouter);
+app.use("/c2c/services/", serviceRouter);
 
 const PORT = 3000;
 app.listen(PORT, () => {
