@@ -20,12 +20,12 @@ app.get("/", (req, res) => {
 connectDB();
 
 //Routes
-app.use("/c2c/users/", userRouter);
-app.use("/c2c/providers/", providerRouter);
-app.use("/c2c/services/", serviceRouter);
-app.use("/c2c/bookings/", bookingRouter);
-app.use("/c2c/reviews/", reviewRouter);
-app.use("/c2c/payments/", paymentRouter);
+app.use("/api/users/", userRouter);
+app.use("/api/providers/", providerRouter);
+app.use("/api/services/", serviceRouter);
+app.use("/api/bookings/", bookingRouter);
+app.use("/api/reviews/", reviewRouter);
+app.use("/api/payments/", paymentRouter);
 
 const PORT = 3000;
 app.listen(PORT, () => {
