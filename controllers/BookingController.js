@@ -7,7 +7,19 @@ export const getAllBookings = async (req, res) => {
   try {
     const bookings = await Booking.find()
       .skip((page - 1) * limit) // Skip documents for previous pages
-      .limit(parseInt(limit)); // Limit the number of documents;;
+      .limit(parseInt(limit)) // Limit the number of documents;;
+      .populate({
+        path: "customer_id",
+        select: "name isActive",
+      })
+      .populate({
+        path: "provider_id",
+        select: "name skills",
+      })
+      .populate({
+        path: "service_id",
+        select: "service_name price_range",
+      });
 
     res.status(200).json({
       length: bookings.length,
@@ -24,7 +36,19 @@ export const getAllBookings = async (req, res) => {
 export const getBookingById = async (req, res) => {
   try {
     const bookingId = req.params.id;
-    const booking = await Booking.findById({ _id: bookingId });
+    const booking = await Booking.findById({ _id: bookingId })
+      .populate({
+        path: "customer_id",
+        select: "name isActive",
+      })
+      .populate({
+        path: "provider_id",
+        select: "name skills",
+      })
+      .populate({
+        path: "service_id",
+        select: "service_name price_range",
+      });
 
     if (!booking) return res.status(404).json({ Message: "Booking not found" });
 

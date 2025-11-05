@@ -27,6 +27,10 @@ const customerSchema = new mongoose.Schema({
     type: String,
     required: [true, "Address is required"],
   },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 export default mongoose.model("Customer", customerSchema);

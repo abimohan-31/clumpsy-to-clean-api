@@ -1,3 +1,4 @@
+import { model } from "mongoose";
 import Payment from "../models/Payment.js";
 // Get all payment
 export const getAllPayments = async (req, res) => {
@@ -6,8 +7,22 @@ export const getAllPayments = async (req, res) => {
   try {
     const payments = await Payment.find()
       .skip((page - 1) * limit) // Skip documents for previous pages
-      .limit(parseInt(limit)); // Limit the number of documents;;
-
+      .limit(parseInt(limit)) // Limit the number of documents;;
+      .populate({
+        path: "booking_id",
+        populate: {
+          path: "customer_id",
+          select: "name",
+        },
+        populate: {
+          path: "provider_id",
+          select: "name skills",
+        },
+        populate: {
+          path: "service_id",
+          select: "service_name",
+        },
+      });
     res.status(200).json({
       length: payments.length,
       page,

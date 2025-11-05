@@ -7,7 +7,19 @@ export const getAllReviews = async (req, res) => {
   try {
     const reviews = await Review.find()
       .skip((page - 1) * limit) // Skip documents for previous pages
-      .limit(parseInt(limit)); // Limit the number of documents;;
+      .limit(parseInt(limit))
+      .populate({
+        path: "customer_id",
+        select: "name isActive",
+      })
+      .populate({
+        path: "provider_id",
+        select: "name skills",
+      })
+      .populate({
+        path: "booking_id",
+        select: "booking_date",
+      }); // Limit the number of documents;;
 
     res.status(200).json({
       length: reviews.length,
