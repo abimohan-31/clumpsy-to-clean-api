@@ -8,7 +8,7 @@ const reviewSchema = new mongoose.Schema({
   },
   customer_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Customer",
     required: [true, "Customer ID is required"],
   },
   provider_id: {

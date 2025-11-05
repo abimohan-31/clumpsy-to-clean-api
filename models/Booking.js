@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
+import Customer from "./Customer.js";
 
 const bookingSchema = new mongoose.Schema({
   customer_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Customer",
     required: [true, "Customer ID is required"],
   },
   provider_id: {
