@@ -7,6 +7,12 @@ const bookingSchema = new mongoose.Schema({
     ref: "Customer",
     required: [true, "Customer ID is required"],
   },
+  provider_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Provider",
+    required: [true, "Provider ID is required"],
+  },
+
   booking_date: {
     type: Date,
     default: Date.now,
