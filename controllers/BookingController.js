@@ -15,12 +15,7 @@ export const getAllBookings = async (req, res) => {
       .populate({
         path: "provider_id",
         select: "name skills",
-      })
-      .populate({
-        path: "service_id",
-        select: "service_name price_range",
       });
-
     res.status(200).json({
       length: bookings.length,
       page,
@@ -44,12 +39,7 @@ export const getBookingById = async (req, res) => {
       .populate({
         path: "provider_id",
         select: "name skills",
-      })
-      .populate({
-        path: "service_id",
-        select: "service_name price_range",
       });
-
     if (!booking) return res.status(404).json({ Message: "Booking not found" });
 
     res.status(200).json(booking);
