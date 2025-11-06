@@ -6,10 +6,12 @@ import reviewRouter from "./routes/ReviewRoutes.js";
 import customerRouter from "./routes/CustomerRoutes.js";
 // import { defaultError, notFound } from "./middleware/ErrorHandlers.js";
 import subscriptionRouter from "./routes/SubscriptionRoutes.js";
+import cors from "cors";
 
 // Initialized express
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // Test if the server is working or not.
 app.get("/", (req, res) => {
