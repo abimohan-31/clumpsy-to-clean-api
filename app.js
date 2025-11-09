@@ -1,41 +1,44 @@
 import express from "express";
 import connectDB from "./config/db.js";
-import providerRouter from "./routes/ProviderRoutes.js";
-import bookingRouter from "./routes/BookingRoutes.js";
-import reviewRouter from "./routes/ReviewRoutes.js";
-import customerRouter from "./routes/CustomerRoutes.js";
-// import { defaultError, notFound } from "./middleware/ErrorHandlers.js";
-import subscriptionRouter from "./routes/SubscriptionRoutes.js";
 import cors from "cors";
+import { defaultError, notFound } from "./middleware/ErrorHandlers.js";
 
-// Initialized express
+// Import route groups
+import authRouter from "./routes/authRoutes.js";
+import adminRouter from "./routes/adminRoutes.js";
+import providerRouter from "./routes/providerRoutes.js";
+import customerRouter from "./routes/customerRoutes.js";
+
+// Initialize express
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Test if the server is working or not.
+// Test if the server is working or not
 app.get("/", (req, res) => {
-  res.send("Welcome to Mini pos API");
+  res.json({
+    success: true,
+    message: "Welcome to Clumsy to Clean API",
+  });
 });
 
-//Connect MongoDB
+// Connect MongoDB
 connectDB();
 
-// //page not found
-// app.use(notFound);
+// API Routes
+app.use("/api/auth", authRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/provider", providerRouter);
+app.use("/api/customer", customerRouter);
 
-// //Error Handlers
-// app.use(defaultError);
+// Page not found
+app.use(notFound);
 
-//Routes
-app.use("/api/providers/", providerRouter);
-app.use("/api/bookings/", bookingRouter);
-app.use("/api/reviews/", reviewRouter);
-app.use("/api/customers/", customerRouter);
-app.use("/api/subscriptions/", subscriptionRouter);
+// Error Handlers
+app.use(defaultError);
 
-//Connect Server
-const PORT = 3000;
+// Connect Server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running in http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
