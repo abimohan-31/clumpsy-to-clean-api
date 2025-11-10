@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "seed": "NODE_ENV=development node seed.js"
   },
   "author": "Abi Mohan",
   "license": "ISC",
