@@ -3,6 +3,42 @@ import Subscription from "../models/Subscription.js";
 import Review from "../models/Review.js";
 import Booking from "../models/Booking.js";
 
+// Check provider approval status (accessible without approval)
+export const checkApprovalStatus = async (req, res) => {
+  try {
+    const provider = await Provider.findById(req.user.id).select("-password");
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        message: "Provider not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        isApproved: provider.isApproved,
+        message: provider.isApproved
+          ? "Your account is approved. You can access all provider features."
+          : "Your account is pending approval. Please wait for admin approval to access provider features.",
+        provider: {
+          _id: provider._id,
+          name: provider.name,
+          email: provider.email,
+          isApproved: provider.isApproved,
+          createdAt: provider.createdAt,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error checking approval status",
+    });
+  }
+};
+
 // Get provider profile
 export const getProviderProfile = async (req, res) => {
   try {

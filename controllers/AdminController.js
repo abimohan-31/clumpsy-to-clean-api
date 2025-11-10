@@ -114,6 +114,13 @@ export const approveProvider = async (req, res) => {
       });
     }
 
+    if (provider.isApproved) {
+      return res.status(400).json({
+        success: false,
+        message: "Provider is already approved",
+      });
+    }
+
     provider.isApproved = true;
     await provider.save();
 
@@ -122,7 +129,7 @@ export const approveProvider = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Provider approved successfully",
+      message: "Provider approved successfully. The provider can now log in and access all provider features.",
       data: {
         provider: providerData,
       },
@@ -135,10 +142,11 @@ export const approveProvider = async (req, res) => {
   }
 };
 
-// Reject provider (set isApproved to false)
+// Reject provider (set isApproved to false and revoke access)
 export const rejectProvider = async (req, res) => {
   try {
     const { id } = req.params;
+    const { reason } = req.body; // Optional rejection reason
 
     const provider = await Provider.findById(id);
     if (!provider) {
@@ -156,9 +164,12 @@ export const rejectProvider = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Provider rejected successfully",
+      message: reason 
+        ? `Provider rejected successfully. Reason: ${reason}`
+        : "Provider rejected successfully. The provider can no longer access provider features.",
       data: {
         provider: providerData,
+        rejectionReason: reason || null,
       },
     });
   } catch (error) {
