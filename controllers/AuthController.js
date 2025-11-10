@@ -19,7 +19,8 @@ export const registerCustomer = async (req, res) => {
     if (!name || !email || !password || !phone || !address) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required: name, email, password, phone, address",
+        message:
+          "All fields are required: name, email, password, phone, address",
       });
     }
 
@@ -76,21 +77,23 @@ export const registerCustomer = async (req, res) => {
 // Register Provider
 export const registerProvider = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      phone,
-      address,
-      experience_years,
-      skills,
-    } = req.body;
+    const { name, email, password, phone, address, experience_years, skills } =
+      req.body;
 
     // Validation
-    if (!name || !email || !password || !phone || !address || !experience_years || !skills) {
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !phone ||
+      !address ||
+      !experience_years ||
+      !skills
+    ) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required: name, email, password, phone, address, experience_years, skills",
+        message:
+          "All fields are required: name, email, password, phone, address, experience_years, skills",
       });
     }
 
@@ -103,7 +106,7 @@ export const registerProvider = async (req, res) => {
       });
     }
 
-    // Create provider (pending approval)
+    // Create provider (pending approval - default is false)
     const provider = new Provider({
       name,
       email,
@@ -113,7 +116,7 @@ export const registerProvider = async (req, res) => {
       experience_years,
       skills,
       role: "provider",
-      isApproved: false,
+      isApproved: false, // Explicitly set to false - requires admin approval
     });
 
     await provider.save();
@@ -124,9 +127,13 @@ export const registerProvider = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Provider registered successfully. Pending admin approval.",
+      message:
+        "Provider registered successfully. Your account is pending admin approval. You will be able to log in and access provider features once approved.",
       data: {
         provider: providerData,
+        isApproved: false,
+        approvalMessage:
+          "Your account requires admin approval before you can access provider features.",
       },
     });
   } catch (error) {
@@ -224,14 +231,6 @@ export const login = async (req, res) => {
       user = await Customer.findOne({ email }).select("+password");
     } else if (role === "provider") {
       user = await Provider.findOne({ email }).select("+password");
-      
-      // Check if provider is approved
-      if (user && !user.isApproved) {
-        return res.status(403).json({
-          success: false,
-          message: "Access denied. Your provider account is pending approval.",
-        });
-      }
     } else if (role === "admin") {
       user = await User.findOne({ email, role: "admin" }).select("+password");
     } else {
@@ -249,12 +248,22 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check password
+    // Check password first
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
+      });
+    }
+
+    // For providers, check approval status AFTER password verification
+    if (role === "provider" && !user.isApproved) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Access denied. Your provider account is pending admin approval. Please contact an administrator or wait for approval.",
+        isApproved: false,
       });
     }
 
@@ -280,4 +289,3 @@ export const login = async (req, res) => {
     });
   }
 };
-
