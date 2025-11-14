@@ -5,16 +5,23 @@ import Provider from "../models/Provider.js";
 // GET /api/reviews - Get all reviews
 export const getAllReviews = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const { provider_id, customer_id } = req.query;
+   const { page = 1, limit = 5, q = "",  provider_id, customer_id  } = req.query;
 
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
+    
     // Build query
     const query = {};
     if (provider_id) query.provider_id = provider_id;
     if (customer_id) query.customer_id = customer_id;
 
-    const reviews = await Review.find(query)
+    const reviews = await Review.find(query, filter)
       .populate("customer_id", "name email")
       .populate("provider_id", "name skills")
       .skip((page - 1) * limit)

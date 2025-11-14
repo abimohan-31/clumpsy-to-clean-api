@@ -141,10 +141,18 @@ export const getSubscription = async (req, res, next) => {
 // GET /api/providers/reviews - Get provider reviews
 export const getReviews = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+   const { page = 1, limit = 5, q = "" } = req.query;
 
-    const reviews = await Review.find({ provider_id: req.user.id })
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
+
+    const reviews = await Review.find({ provider_id: req.user.id }, filter)
       .populate("customer_id", "name email")
       .skip((page - 1) * limit)
       .limit(limit)
@@ -173,10 +181,17 @@ export const getReviews = async (req, res, next) => {
 // GET /api/providers/public - Get all approved providers (public route)
 export const getAllProviders = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 5, q = "" } = req.query;
 
-    const providers = await Provider.find({ isApproved: true })
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
+    const providers = await Provider.find(filter,{ isApproved: true })
       .select("-password")
       .skip((page - 1) * limit)
       .limit(limit)

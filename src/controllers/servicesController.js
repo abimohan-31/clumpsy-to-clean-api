@@ -4,10 +4,16 @@ import Provider from "../models/Provider.js";
 // GET /api/services - Get all services (public route)
 export const getAllServices = async (req, res, next) => {
   try {
-    const { category, isActive } = req.query;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const { page = 1, limit = 5, q = "", category, isActive } = req.query;
 
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
     // Build query
     const query = {};
     if (category) {
@@ -19,7 +25,7 @@ export const getAllServices = async (req, res, next) => {
       query.isActive = true; // Default to active services
     }
 
-    const services = await Service.find(query)
+    const services = await Service.find(query, filter)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ category: 1, name: 1 });
@@ -66,10 +72,18 @@ export const getAllCategories = async (req, res, next) => {
 export const getServicesByCategory = async (req, res, next) => {
   try {
     const { category } = req.params;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const { page = 1, limit = 5, q = "" } = req.query;
 
-    const services = await Service.find({
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
+
+    const services = await Service.find(filter, {
       category: category,
       isActive: true,
     })
@@ -132,8 +146,16 @@ export const getServiceById = async (req, res, next) => {
 export const getProvidersByService = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 5, q = "" } = req.query;
+
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
 
     // Get service details
     const service = await Service.findById(id);
@@ -146,7 +168,7 @@ export const getProvidersByService = async (req, res, next) => {
     }
 
     // Find providers who have this service in their skills
-    const providers = await Provider.find({
+    const providers = await Provider.find(filter, {
       isApproved: true,
       skills: { $in: [new RegExp(service.name, "i")] },
     })

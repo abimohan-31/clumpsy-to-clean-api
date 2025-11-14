@@ -4,10 +4,17 @@ import Provider from "../models/Provider.js";
 // GET /api/subscriptions - Get all subscriptions (admin only)
 export const getAllSubscriptions = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 5, q = ""} = req.query;
 
-    const subscriptions = await Subscription.find()
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
+    const subscriptions = await Subscription.find(filter)
       .populate("provider_id", "name email")
       .skip((page - 1) * limit)
       .limit(limit)

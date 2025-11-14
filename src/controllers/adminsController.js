@@ -7,10 +7,17 @@ import Review from "../models/Review.js";
 // GET /api/admins/providers - Get all providers
 export const getAllProviders = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 5, q = "" } = req.query;
 
-    const providers = await Provider.find()
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q } },
+        { email: { $regex: q } },
+        { phone: { $regex: q } },
+      ],
+    };
+    const providers = await Provider.find(filter)
       .select("-password")
       .skip((page - 1) * limit)
       .limit(limit)
