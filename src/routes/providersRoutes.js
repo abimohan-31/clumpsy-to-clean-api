@@ -18,12 +18,7 @@ import {
 const providersRouter = express.Router();
 
 // Route that requires authentication but NOT approval (for checking status)
-providersRouter.get(
-  "/check-approval",
-  verifyToken,
-  verifyRole("provider"),
-  checkApprovalStatus
-);
+providersRouter.get("/check-approval", checkApprovalStatus);
 
 // Protected routes (require authentication, provider role, and approval)
 providersRouter.use(verifyToken);

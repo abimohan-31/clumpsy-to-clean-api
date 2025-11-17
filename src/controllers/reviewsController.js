@@ -5,17 +5,8 @@ import Provider from "../models/Provider.js";
 // GET /api/reviews - Get all reviews
 export const getAllReviews = async (req, res, next) => {
   try {
-   const { page = 1, limit = 5, q = "",  provider_id, customer_id  } = req.query;
+    const { page = 1, limit = 5, provider_id, customer_id } = req.query;
 
-    const filter = {
-      isActive: true,
-      $or: [
-        { name: { $regex: q } },
-        { email: { $regex: q } },
-        { phone: { $regex: q } },
-      ],
-    };
-    
     // Build query
     const query = {};
     if (provider_id) query.provider_id = provider_id;

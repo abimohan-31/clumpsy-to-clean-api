@@ -45,7 +45,7 @@ const subscriptionSchema = new mongoose.Schema(
 // 🔁 Automatically mark expired subscriptions
 subscriptionSchema.pre("save", function (next) {
   if (this.end_date < new Date() && this.status === "Active") {
-    this.status = "Expired";
+    this.status = "Active";
   }
   next();
 });

@@ -141,7 +141,7 @@ export const getSubscription = async (req, res, next) => {
 // GET /api/providers/reviews - Get provider reviews
 export const getReviews = async (req, res, next) => {
   try {
-   const { page = 1, limit = 5, q = "" } = req.query;
+    const { page = 1, limit = 5, q = "" } = req.query;
 
     const filter = {
       isActive: true,
@@ -184,32 +184,32 @@ export const getAllProviders = async (req, res, next) => {
     const { page = 1, limit = 5, q = "" } = req.query;
 
     const filter = {
-      isActive: true,
+      isApproved: true,
       $or: [
-        { name: { $regex: q } },
-        { email: { $regex: q } },
-        { phone: { $regex: q } },
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
       ],
     };
-    const providers = await Provider.find(filter,{ isApproved: true })
+    const providers = await Provider.find(filter)
       .select("-password")
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ rating: -1, createdAt: -1 });
 
-    const total = await Provider.countDocuments({ isApproved: true });
+    const total = await Provider.countDocuments(filter);
 
     return res.status(200).json({
       success: true,
       statusCode: 200,
       data: {
-        providers,
         pagination: {
           page,
           limit,
           total,
           pages: Math.ceil(total / limit),
         },
+        providers,
       },
     });
   } catch (error) {

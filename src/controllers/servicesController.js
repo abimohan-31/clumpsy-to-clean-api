@@ -9,9 +9,9 @@ export const getAllServices = async (req, res, next) => {
     const filter = {
       isActive: true,
       $or: [
-        { name: { $regex: q } },
-        { email: { $regex: q } },
-        { phone: { $regex: q } },
+        { name: { $regex: q, $options: "i" } },
+        { category: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
       ],
     };
     // Build query
@@ -77,24 +77,17 @@ export const getServicesByCategory = async (req, res, next) => {
     const filter = {
       isActive: true,
       $or: [
-        { name: { $regex: q } },
-        { email: { $regex: q } },
-        { phone: { $regex: q } },
+        { name: { $regex: q, $options: "i" } },
+        { category: { $regex: q, $options: "i" } },
       ],
     };
 
-    const services = await Service.find(filter, {
-      category: category,
-      isActive: true,
-    })
+    const services = await Service.find(filter)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ name: 1 });
 
-    const total = await Service.countDocuments({
-      category: category,
-      isActive: true,
-    });
+    const total = await Service.countDocuments(filter);
 
     return res.status(200).json({
       success: true,
@@ -151,9 +144,8 @@ export const getProvidersByService = async (req, res, next) => {
     const filter = {
       isActive: true,
       $or: [
-        { name: { $regex: q } },
-        { email: { $regex: q } },
-        { phone: { $regex: q } },
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
       ],
     };
 
@@ -169,7 +161,6 @@ export const getProvidersByService = async (req, res, next) => {
 
     // Find providers who have this service in their skills
     const providers = await Provider.find(filter, {
-      isApproved: true,
       skills: { $in: [new RegExp(service.name, "i")] },
     })
       .select("-password")
@@ -177,8 +168,7 @@ export const getProvidersByService = async (req, res, next) => {
       .limit(limit)
       .sort({ rating: -1, createdAt: -1 });
 
-    const total = await Provider.countDocuments({
-      isApproved: true,
+    const total = await Provider.countDocuments(filter, {
       skills: { $in: [new RegExp(service.name, "i")] },
     });
 
@@ -186,6 +176,12 @@ export const getProvidersByService = async (req, res, next) => {
       success: true,
       statusCode: 200,
       data: {
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
         service: {
           _id: service._id,
           name: service.name,
@@ -194,12 +190,6 @@ export const getProvidersByService = async (req, res, next) => {
           base_price: service.base_price,
         },
         providers,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
-        },
       },
     });
   } catch (error) {
