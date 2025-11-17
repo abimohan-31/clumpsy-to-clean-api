@@ -15,6 +15,16 @@ import {
   getAllReviews,
   deleteReview,
 } from "../controllers/adminsController.js";
+import {
+  createService,
+  deleteService,
+  updateService,
+} from "../controllers/servicesController.js";
+import {
+  createSubscription,
+  deleteSubscription,
+  updateSubscription,
+} from "../controllers/subscriptionsController.js";
 
 const adminsRouter = express.Router();
 
@@ -40,9 +50,17 @@ adminsRouter.get("/admins", getAllAdmins);
 
 // Subscriptions
 adminsRouter.get("/subscriptions", getAllSubscriptions);
+adminsRouter.post("/subscriptions", createSubscription);
+adminsRouter.delete("/subscriptions/:id", deleteSubscription);
+adminsRouter.put("/subscriptions/:id", updateSubscription);
 
 // Reviews (remove inappropriate content)
 adminsRouter.get("/reviews", getAllReviews);
 adminsRouter.delete("/reviews/:id", deleteReview);
+
+// Services
+adminsRouter.post("/services", createService);
+adminsRouter.put("/services/:id", updateService);
+adminsRouter.post("/services/:id", deleteService);
 
 export default adminsRouter;

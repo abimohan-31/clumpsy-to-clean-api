@@ -6,6 +6,12 @@ import {
   getAllProviders,
   getProviderById,
 } from "../controllers/customersController.js";
+import {
+  createReview,
+  deleteReview,
+  updateReview,
+} from "../controllers/reviewsController.js";
+import { getProvidersByService } from "../controllers/servicesController.js";
 
 const customersRouter = express.Router();
 
@@ -20,5 +26,12 @@ customersRouter.put("/profile", updateProfile);
 // Provider viewing routes
 customersRouter.get("/providers", getAllProviders);
 customersRouter.get("/providers/:id", getProviderById);
+customersRouter.get("/services/:id/providers", getProvidersByService);
+
+
+//Review Create, update, delete routes (customer)
+customersRouter.post("/reviews", createReview);
+customersRouter.put("/reviews/:id", updateReview);
+customersRouter.delete("reviews/:id", deleteReview);
 
 export default customersRouter;

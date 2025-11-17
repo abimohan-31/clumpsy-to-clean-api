@@ -12,9 +12,9 @@ export const getAllProviders = async (req, res, next) => {
     const filter = {
       isActive: true,
       $or: [
-        { name: { $regex: q } },
-        { email: { $regex: q } },
-        { phone: { $regex: q } },
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
       ],
     };
     const providers = await Provider.find(filter)
@@ -210,10 +210,18 @@ export const deleteProvider = async (req, res, next) => {
 // GET /api/admins/customers - Get all customers
 export const getAllCustomers = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 5, q = "" } = req.query;
 
-    const customers = await Customer.find()
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
+      ],
+    };
+
+    const customers = await Customer.find(filter)
       .select("-password")
       .skip((page - 1) * limit)
       .limit(limit)
@@ -224,6 +232,7 @@ export const getAllCustomers = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       statusCode: 200,
+      message: "Fetch the customers successfully",
       data: {
         customers,
         pagination: {
@@ -257,6 +266,7 @@ export const getCustomerById = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       statusCode: 200,
+      message:"Fetch a customer successfully",
       data: {
         customer,
       },
@@ -294,10 +304,17 @@ export const deleteCustomer = async (req, res, next) => {
 // GET /api/admins/admins - Get all admins
 export const getAllAdmins = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 5, q = "" } = req.query;
 
-    const admins = await User.find({ role: "admin" })
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
+      ],
+    };
+    const admins = await User.find({ role: "admin" }, filter)
       .select("-password")
       .skip((page - 1) * limit)
       .limit(limit)
@@ -308,6 +325,7 @@ export const getAllAdmins = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       statusCode: 200,
+      message:"Fetch all admins successfully",
       data: {
         admins,
         pagination: {
@@ -326,10 +344,18 @@ export const getAllAdmins = async (req, res, next) => {
 // GET /api/admins/subscriptions - Get all subscriptions
 export const getAllSubscriptions = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 10, q = "" } = req.query;
 
-    const subscriptions = await Subscription.find()
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
+      ],
+    };
+
+    const subscriptions = await Subscription.find(filter)
       .populate("provider_id", "name email")
       .skip((page - 1) * limit)
       .limit(limit)
@@ -340,6 +366,7 @@ export const getAllSubscriptions = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       statusCode: 200,
+      message:"Fetch all subscriptions successfully",
       data: {
         subscriptions,
         pagination: {
@@ -358,10 +385,18 @@ export const getAllSubscriptions = async (req, res, next) => {
 // GET /api/admins/reviews - Get all reviews
 export const getAllReviews = async (req, res, next) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { page = 1, limit = 5, q = "" } = req.query;
 
-    const reviews = await Review.find()
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
+      ],
+    };
+
+    const reviews = await Review.find(filter)
       .populate("customer_id", "name email")
       .populate("provider_id", "name skills")
       .skip((page - 1) * limit)
@@ -373,6 +408,7 @@ export const getAllReviews = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       statusCode: 200,
+      message:"Fetch all reviews successfully",
       data: {
         reviews,
         pagination: {
@@ -412,3 +448,4 @@ export const deleteReview = async (req, res, next) => {
     next(error);
   }
 };
+
