@@ -35,8 +35,6 @@ const customerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-import mongoose from "mongoose";
-
 const serviceSchema = new mongoose.Schema(
   {
     name: String,
