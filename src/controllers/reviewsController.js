@@ -3,14 +3,16 @@ import Customer from "../models/Customer.js";
 import Provider from "../models/Provider.js";
 
 // GET /api/reviews - Get all reviews
+// GET /api/reviews - Get all reviews
 export const getAllReviews = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5, provider_id, customer_id } = req.query;
+    const { page = 1, limit = 5, provider_id, customer_id, rating } = req.query;
 
     // Build query
     const query = {};
     if (provider_id) query.provider_id = provider_id;
     if (customer_id) query.customer_id = customer_id;
+    if (rating !== undefined) query.rating = Number(rating); // Added rating filter
 
     const reviews = await Review.find(query)
       .populate("customer_id", "name email")

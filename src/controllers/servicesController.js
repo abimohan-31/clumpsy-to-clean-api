@@ -6,15 +6,6 @@ export const getAllServices = async (req, res, next) => {
   try {
     const { page = 1, limit = 5, q = "", category, isActive } = req.query;
 
-    const filter = {
-      isActive: true,
-      $or: [
-        { name: { $regex: q, $options: "i" } },
-        { category: { $regex: q, $options: "i" } },
-        { phone: { $regex: q, $options: "i" } },
-      ],
-    };
-    // Build query
     const query = {};
     if (category) {
       query.category = category;
@@ -25,12 +16,22 @@ export const getAllServices = async (req, res, next) => {
       query.isActive = true; // Default to active services
     }
 
-    const services = await Service.find(query, filter)
+    // Filter for search
+    const searchFilter = {
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { category: { $regex: q, $options: "i" } },
+      ],
+    };
+
+    const finalFilter = { ...query, ...searchFilter };
+
+    const services = await Service.find(finalFilter)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ category: 1, name: 1 });
 
-    const total = await Service.countDocuments(query);
+    const total = await Service.countDocuments(finalFilter);
 
     return res.status(200).json({
       success: true,
@@ -74,7 +75,8 @@ export const getServicesByCategory = async (req, res, next) => {
     const { category } = req.params;
     const { page = 1, limit = 5, q = "" } = req.query;
 
-    const filter = {
+    const matchFilter = {
+      category,
       isActive: true,
       $or: [
         { name: { $regex: q, $options: "i" } },
@@ -82,12 +84,12 @@ export const getServicesByCategory = async (req, res, next) => {
       ],
     };
 
-    const services = await Service.find(filter)
+    const services = await Service.find(matchFilter)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ name: 1 });
 
-    const total = await Service.countDocuments(filter);
+    const total = await Service.countDocuments(matchFilter);
 
     return res.status(200).json({
       success: true,
