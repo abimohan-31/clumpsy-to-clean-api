@@ -9,6 +9,7 @@ import Service from "./src/models/Service.js";
 import PriceList from "./src/models/PriceList.js";
 import Review from "./src/models/Review.js";
 import JobPost from "./src/models/JobPost.js";
+import Subscription from "./src/models/Subscription.js";
 
 dotenv.config();
 
@@ -1307,6 +1308,87 @@ const seedJobPosts = async (customers, services) => {
   }
 };
 
+// Seed Subscriptions
+const seedSubscriptions = async (providers) => {
+  try {
+    console.log("Seeding Subscriptions...");
+
+    const subscriptions = [];
+
+    // Helper function to get random element from array
+    const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    // Get approved providers only (subscriptions are for approved providers)
+    const approvedProviders = providers.filter((p) => p.isApproved === true);
+
+    // Subscription plans with pricing (in LKR)
+    const plans = [
+      {
+        plan_name: "Free",
+        amount: 0,
+        duration_days: 30, // 1 month
+      },
+      {
+        plan_name: "Standard",
+        amount: 5000, // Rs. 5,000 per month
+        duration_days: 30,
+      },
+      {
+        plan_name: "Premium",
+        amount: 10000, // Rs. 10,000 per month
+        duration_days: 30,
+      },
+    ];
+
+    // Create subscriptions for 60% of approved providers
+    const numSubscriptions = Math.floor(approvedProviders.length * 0.6);
+    const providersWithSubscriptions = approvedProviders
+      .sort(() => Math.random() - 0.5)
+      .slice(0, numSubscriptions);
+
+    for (const provider of providersWithSubscriptions) {
+      const plan = getRandom(plans);
+      const startDate = new Date(
+        Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000
+      ); // Random date within last 60 days
+      const endDate = new Date(
+        startDate.getTime() + plan.duration_days * 24 * 60 * 60 * 1000
+      );
+
+      // Determine status based on end date
+      let status = "Active";
+      if (endDate < new Date()) {
+        status = getRandom(["Expired", "Cancelled"]);
+      }
+
+      // Calculate renewal date (30 days after end date if active)
+      let renewalDate = null;
+      if (status === "Active") {
+        renewalDate = new Date(
+          endDate.getTime() + plan.duration_days * 24 * 60 * 60 * 1000
+        );
+      }
+
+      subscriptions.push({
+        provider_id: provider._id,
+        plan_name: plan.plan_name,
+        start_date: startDate,
+        end_date: endDate,
+        renewal_date: renewalDate,
+        status: status,
+        amount: plan.amount,
+      });
+    }
+
+    const createdSubscriptions = await Subscription.insertMany(subscriptions);
+    console.log(`${createdSubscriptions.length} subscriptions created`);
+    return createdSubscriptions;
+  } catch (error) {
+    console.error("Error seeding subscriptions:", error);
+    throw error;
+  }
+};
+
 // --------------------
 // 3. Seed Function
 // --------------------
@@ -1322,6 +1404,7 @@ async function seedUsers() {
     await PriceList.deleteMany();
     await Review.deleteMany();
     await JobPost.deleteMany();
+    await Subscription.deleteMany();
 
     console.log("Old data removed");
 
@@ -1353,6 +1436,9 @@ async function seedUsers() {
     // Seed job posts (after services and customers are created)
     const jobPosts = await seedJobPosts(createdCustomers, services);
 
+    // Seed subscriptions (after providers are created)
+    const subscriptions = await seedSubscriptions(createdProviders);
+
     // Summary
     console.log("=".repeat(50));
     console.log("Seeding Summary:");
@@ -1363,6 +1449,7 @@ async function seedUsers() {
     console.log(`Price Lists: ${priceLists.length}`);
     console.log(`Reviews: ${reviews.length}`);
     console.log(`Job Posts: ${jobPosts.length}`);
+    console.log(`Subscriptions: ${subscriptions.length}`);
     console.log("=".repeat(50));
     console.log("Seed successfully completed");
     console.log("");

@@ -7,7 +7,7 @@ import Review from "../models/Review.js";
 // GET /api/admins/providers - Get all providers
 export const getAllProviders = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5, q = "" } = req.query;
+    const { page = 1, limit = 10, q = "" } = req.query;
 
     const filter = {
       isApproved: true,
@@ -218,7 +218,7 @@ export const deleteProvider = async (req, res, next) => {
 // GET /api/admins/customers - Get all customers
 export const getAllCustomers = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5, q = "" } = req.query;
+    const { page = 1, limit = 10, q = "" } = req.query;
 
     const filter = {
       isActive: true,
@@ -312,7 +312,7 @@ export const deleteCustomer = async (req, res, next) => {
 // GET /api/admins/admins - Get all admins
 export const getAllAdmins = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5, q = "" } = req.query;
+    const { page = 1, limit = 10, q = "" } = req.query;
 
     const filter = {
       isActive: true,
@@ -392,7 +392,7 @@ export const getAllSubscriptions = async (req, res, next) => {
 // GET /api/admins/reviews - Get all reviews
 export const getAllReviews = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5 } = req.query;
+    const { page = 1, limit = 10 } = req.query;
 
     const reviews = await Review.find(filter)
       .populate("customer_id", "name email")
