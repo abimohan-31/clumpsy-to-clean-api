@@ -7,6 +7,7 @@ import Provider from "./src/models/Provider.js";
 import Customer from "./src/models/Customer.js";
 import Service from "./src/models/Service.js";
 import PriceList from "./src/models/PriceList.js";
+import Review from "./src/models/Review.js";
 
 dotenv.config();
 
@@ -478,7 +479,8 @@ const seedServices = async () => {
       // Painting Services
       {
         name: "interior painting",
-        description: "Professional interior painting services for homes and offices",
+        description:
+          "Professional interior painting services for homes and offices",
         category: "Painting",
         base_price: 5000,
         unit: "hour",
@@ -500,7 +502,7 @@ const seedServices = async () => {
         unit: "hour",
         isActive: true,
       },
-      
+
       // Gardening Services
       {
         name: "garden maintenance",
@@ -526,11 +528,12 @@ const seedServices = async () => {
         unit: "hour",
         isActive: true,
       },
-      
+
       // Cleaning Services
       {
         name: "house cleaning",
-        description: "Comprehensive house cleaning services for residential spaces",
+        description:
+          "Comprehensive house cleaning services for residential spaces",
         category: "Cleaning",
         base_price: 3000,
         unit: "hour",
@@ -554,13 +557,14 @@ const seedServices = async () => {
       },
       {
         name: "window cleaning",
-        description: "Window and glass cleaning services for residential and commercial",
+        description:
+          "Window and glass cleaning services for residential and commercial",
         category: "Cleaning",
         base_price: 2500,
         unit: "hour",
         isActive: true,
       },
-      
+
       // Plumbing Services
       {
         name: "plumbing repair",
@@ -586,7 +590,7 @@ const seedServices = async () => {
         unit: "hour",
         isActive: true,
       },
-      
+
       // Electrical Services
       {
         name: "electrical repair",
@@ -612,7 +616,7 @@ const seedServices = async () => {
         unit: "hour",
         isActive: true,
       },
-      
+
       // Carpentry Services
       {
         name: "furniture repair",
@@ -630,7 +634,7 @@ const seedServices = async () => {
         unit: "hour",
         isActive: true,
       },
-      
+
       // Handyman Services
       {
         name: "general handyman",
@@ -648,7 +652,7 @@ const seedServices = async () => {
         unit: "hour",
         isActive: true,
       },
-      
+
       // Moving Services
       {
         name: "house moving",
@@ -759,14 +763,16 @@ const seedPriceLists = async (services) => {
         service_id: houseCleaning._id,
         price_type: "fixed",
         fixed_price: 10000,
-        description: "Standard house cleaning for small apartments (1-2 bedrooms) - LKR",
+        description:
+          "Standard house cleaning for small apartments (1-2 bedrooms) - LKR",
         isActive: true,
       });
       priceLists.push({
         service_id: houseCleaning._id,
         price_type: "fixed",
         fixed_price: 15000,
-        description: "Standard house cleaning for medium homes (3-4 bedrooms) - LKR",
+        description:
+          "Standard house cleaning for medium homes (3-4 bedrooms) - LKR",
         isActive: true,
       });
     }
@@ -886,7 +892,8 @@ const seedPriceLists = async (services) => {
         service_id: electricalMaintenance._id,
         price_type: "fixed",
         fixed_price: 15000,
-        description: "Fixed price for electrical safety check and maintenance (LKR)",
+        description:
+          "Fixed price for electrical safety check and maintenance (LKR)",
         isActive: true,
       });
     }
@@ -899,7 +906,8 @@ const seedPriceLists = async (services) => {
         price_type: "range",
         min_price: 3000,
         max_price: 15000,
-        description: "Price range for furniture repair based on item size (LKR)",
+        description:
+          "Price range for furniture repair based on item size (LKR)",
         isActive: true,
       });
     }
@@ -955,7 +963,8 @@ const seedPriceLists = async (services) => {
         price_type: "range",
         min_price: 15000,
         max_price: 50000,
-        description: "Price range for house moving based on distance and items (LKR)",
+        description:
+          "Price range for house moving based on distance and items (LKR)",
         isActive: true,
       });
     }
@@ -965,6 +974,90 @@ const seedPriceLists = async (services) => {
     return createdPriceLists;
   } catch (error) {
     console.error("Error seeding price lists:", error);
+    throw error;
+  }
+};
+
+// Seed Reviews
+const seedReviews = async (providers, customers) => {
+  try {
+    console.log("Seeding Reviews...");
+
+    const reviews = [];
+
+    // Helper function to get random element from array
+    const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    // Get approved providers only (for realistic reviews)
+    const approvedProviders = providers.filter((p) => p.isApproved === true);
+
+    // Create reviews - mix of positive and constructive feedback
+    const reviewComments = [
+      // 5-star reviews
+      {
+        rating: 5,
+        comments: [
+          "Excellent service! Very professional and completed the work on time.",
+          "Outstanding quality of work. Highly recommended!",
+          "Great experience from start to finish. Will definitely hire again.",
+          "Very satisfied with the service. Exceeded my expectations.",
+          "Professional, punctual, and did an amazing job. Five stars!",
+          "Best service provider I've worked with. Quality work at reasonable prices.",
+          "Very reliable and skilled. The work was done perfectly.",
+          "Excellent communication and great attention to detail.",
+        ],
+      },
+      // 4-star reviews
+      {
+        rating: 4,
+        comments: [
+          "Good service overall. Minor delays but work quality was good.",
+          "Satisfied with the work. Professional and courteous.",
+          "Good job done. Would recommend to others.",
+          "Quality work, though took a bit longer than expected.",
+          "Very good service. Minor issues but overall happy.",
+          "Professional service. Met expectations.",
+          "Good work done. Would hire again.",
+          "Satisfactory service with room for minor improvements.",
+        ],
+      },
+      // 3-star reviews
+      {
+        rating: 3,
+        comments: [
+          "Average service. Work was done but could be better.",
+          "Acceptable work but communication could improve.",
+          "Service was okay, but took longer than promised.",
+          "Work completed but quality was average.",
+          "Met basic requirements but expected more attention to detail.",
+        ],
+      },
+    ];
+
+    // Create 30-40 reviews distributed across providers and customers
+    const numReviews = 35;
+    for (let i = 0; i < numReviews; i++) {
+      const provider = getRandom(approvedProviders);
+      const customer = getRandom(customers);
+      const reviewType = getRandom(reviewComments);
+      const comment = getRandom(reviewType.comments);
+
+      reviews.push({
+        provider_id: provider._id,
+        customer_id: customer._id,
+        rating: reviewType.rating,
+        comment: comment,
+        review_date: new Date(
+          Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000
+        ), // Random date within last 90 days
+      });
+    }
+
+    const createdReviews = await Review.insertMany(reviews);
+    console.log(`${createdReviews.length} reviews created`);
+    return createdReviews;
+  } catch (error) {
+    console.error("Error seeding reviews:", error);
     throw error;
   }
 };
@@ -982,6 +1075,7 @@ async function seedUsers() {
     await Customer.deleteMany();
     await Service.deleteMany();
     await PriceList.deleteMany();
+    await Review.deleteMany();
 
     console.log("Old data removed");
 
@@ -999,13 +1093,16 @@ async function seedUsers() {
     }));
 
     // Insert providers and customers
-    await Provider.insertMany(providerData);
-    await Customer.insertMany(customerData);
+    const createdProviders = await Provider.insertMany(providerData);
+    const createdCustomers = await Customer.insertMany(customerData);
     console.log("Providers and customers seeded");
 
     // Seed services and price lists
     const services = await seedServices();
     const priceLists = await seedPriceLists(services);
+
+    // Seed reviews (after providers and customers are created)
+    const reviews = await seedReviews(createdProviders, createdCustomers);
 
     // Summary
     console.log("=".repeat(50));
@@ -1015,17 +1112,28 @@ async function seedUsers() {
     console.log(`Customers: ${customerData.length}`);
     console.log(`Services: ${services.length}`);
     console.log(`Price Lists: ${priceLists.length}`);
+    console.log(`Reviews: ${reviews.length}`);
     console.log("=".repeat(50));
     console.log("Seed successfully completed");
     console.log("");
     console.log("Example Price Lists:");
     console.log(" - Painting: Rs. 200-300 per square foot");
-    console.log(" - Gardening: Rs. 5,000-15,000 (maintenance) or Rs. 20,000-100,000 (landscaping)");
+    console.log(
+      " - Gardening: Rs. 5,000-15,000 (maintenance) or Rs. 20,000-100,000 (landscaping)"
+    );
     console.log(" - Cleaning: Rs. 10,000-30,000 (house/deep cleaning)");
-    console.log(" - Plumbing: Rs. 5,000-15,000 (leak fixing) or Rs. 8,000/hour (repairs)");
-    console.log(" - Electrical: Rs. 9,000/hour (repairs) or Rs. 15,000 (maintenance)");
-    console.log(" - Carpentry: Rs. 3,000-15,000 (furniture repair) or Rs. 5,000/cabinet");
-    console.log(" - Handyman: Rs. 4,000/hour (general) or Rs. 5,000-15,000 (appliance repair)");
+    console.log(
+      " - Plumbing: Rs. 5,000-15,000 (leak fixing) or Rs. 8,000/hour (repairs)"
+    );
+    console.log(
+      " - Electrical: Rs. 9,000/hour (repairs) or Rs. 15,000 (maintenance)"
+    );
+    console.log(
+      " - Carpentry: Rs. 3,000-15,000 (furniture repair) or Rs. 5,000/cabinet"
+    );
+    console.log(
+      " - Handyman: Rs. 4,000/hour (general) or Rs. 5,000-15,000 (appliance repair)"
+    );
     console.log(" - Moving: Rs. 15,000-50,000 (based on distance and items)");
     console.log("");
 
@@ -1037,4 +1145,3 @@ async function seedUsers() {
 }
 
 seedUsers();
-
