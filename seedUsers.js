@@ -2,55 +2,13 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
+// Import models from src
+import Provider from "./src/models/Provider.js";
+import Customer from "./src/models/Customer.js";
+import Service from "./src/models/Service.js";
+import PriceList from "./src/models/PriceList.js";
+
 dotenv.config();
-
-// --------------------
-// 1. Mongoose Models
-// --------------------
-const providerSchema = new mongoose.Schema(
-  {
-    name: String,
-    email: String,
-    password: String,
-    phone: String,
-    address: String,
-    experience_years: Number,
-    skills: [String],
-    availability_status: String,
-    rating: Number,
-    role: String,
-    isApproved: Boolean,
-  },
-  { timestamps: true }
-);
-
-const customerSchema = new mongoose.Schema(
-  {
-    name: String,
-    email: String,
-    password: String,
-    role: String,
-    isActive: Boolean,
-  },
-  { timestamps: true }
-);
-
-const serviceSchema = new mongoose.Schema(
-  {
-    name: String,
-    description: String,
-    category: String,
-    base_price: Number,
-    unit: String,
-    isActive: Boolean,
-    icon: String,
-  },
-  { timestamps: true }
-);
-
-const Provider = mongoose.model("Provider", providerSchema);
-const Customer = mongoose.model("Customer", customerSchema);
-const Service = mongoose.model("Service", serviceSchema);
 
 // --------------------
 // 2. Provider & Customer Data
@@ -511,74 +469,173 @@ const customers = [
   },
 ];
 
-const services = [
-  {
-    name: "Plumbing Repair",
-    price: "1500",
-    unit: "per hour",
-    category: "Plumbing",
-  },
-  {
-    name: "Pipe Leakage Fixing",
-    price: "2500",
-    unit: "per job",
-    category: "Plumbing",
-  },
-  {
-    name: "Electrical Wiring",
-    price: "2000",
-    unit: "per hour",
-    category: "Electrical",
-  },
-  {
-    name: "Fan Installation",
-    price: "1800",
-    unit: "per item",
-    category: "Electrical",
-  },
-  {
-    name: "Switchboard Repair",
-    price: "1200",
-    unit: "per item",
-    category: "Electrical",
-  },
-  {
-    name: "House Cleaning",
-    price: "3000",
-    unit: "per hour",
-    category: "Cleaning",
-  },
-  {
-    name: "Bathroom Deep Cleaning",
-    price: "4500",
-    unit: "per bathroom",
-    category: "Cleaning",
-  },
-  {
-    name: "Sofa Cleaning",
-    price: "3500",
-    unit: "per job",
-    category: "Cleaning",
-  },
-  {
-    name: "Garden Maintenance",
-    price: "2500",
-    unit: "per day",
-    category: "Gardening",
-  },
-  {
-    name: "Grass Cutting",
-    price: "2000",
-    unit: "per job",
-    category: "Gardening",
-  },
-  {
-    name: "Interior Painting",
-    price: "180",
-    unit: "per sqft",
-    category: "Pain",
-  },
-];
+// Seed Services
+const seedServices = async () => {
+  try {
+    console.log("Seeding Services...");
+
+    const services = [
+      {
+        name: "painting",
+        description: "Professional painting services for homes and offices",
+        category: "Painting",
+        base_price: 5000, // LKR per hour
+        unit: "hour",
+        isActive: true,
+      },
+      {
+        name: "gardening",
+        description: "Expert gardening and landscaping services",
+        category: "Gardening",
+        base_price: 4000, // LKR per hour
+        unit: "hour",
+        isActive: true,
+      },
+      {
+        name: "cleaning",
+        description: "Thorough cleaning services for residential and commercial spaces",
+        category: "Cleaning",
+        base_price: 3000, // LKR per hour
+        unit: "hour",
+        isActive: true,
+      },
+      {
+        name: "plumbing",
+        description: "Professional plumbing repairs and installations",
+        category: "Plumbing",
+        base_price: 6000, // LKR per hour
+        unit: "hour",
+        isActive: true,
+      },
+      {
+        name: "electrical",
+        description: "Licensed electrical work and repairs",
+        category: "Electrical",
+        base_price: 7000, // LKR per hour
+        unit: "hour",
+        isActive: true,
+      },
+    ];
+
+    const createdServices = await Service.insertMany(services);
+    console.log(`${createdServices.length} services created`);
+    return createdServices;
+  } catch (error) {
+    console.error("Error seeding services:", error);
+    throw error;
+  }
+};
+
+// Seed Price Lists
+const seedPriceLists = async (services) => {
+  try {
+    console.log("Seeding Price Lists...");
+
+    const paintingService = services.find((s) => s.name === "painting");
+    const gardeningService = services.find((s) => s.name === "gardening");
+    const cleaningService = services.find((s) => s.name === "cleaning");
+    const plumbingService = services.find((s) => s.name === "plumbing");
+    const electricalService = services.find((s) => s.name === "electrical");
+
+    const priceLists = [];
+
+    // Paint: price per square foot
+    if (paintingService) {
+      priceLists.push({
+        service_id: paintingService._id,
+        price_type: "per_unit",
+        unit_price: 250, // Rs. 250 per square foot
+        unit: "square_feet",
+        description: "Price per square foot for interior painting (LKR)",
+        isActive: true,
+      });
+      priceLists.push({
+        service_id: paintingService._id,
+        price_type: "per_unit",
+        unit_price: 300, // Rs. 300 per square foot
+        unit: "square_feet",
+        description: "Price per square foot for exterior painting (LKR)",
+        isActive: true,
+      });
+    }
+
+    // Gardening: average price range
+    if (gardeningService) {
+      priceLists.push({
+        service_id: gardeningService._id,
+        price_type: "range",
+        min_price: 5000,
+        max_price: 15000,
+        description: "Average price range for basic gardening services per visit (LKR)",
+        isActive: true,
+      });
+      priceLists.push({
+        service_id: gardeningService._id,
+        price_type: "range",
+        min_price: 20000,
+        max_price: 50000,
+        description: "Price range for full landscaping projects (LKR)",
+        isActive: true,
+      });
+    }
+
+    // Cleaning: fixed price
+    if (cleaningService) {
+      priceLists.push({
+        service_id: cleaningService._id,
+        price_type: "fixed",
+        fixed_price: 10000,
+        description: "Standard cleaning service for small apartments (1-2 bedrooms) - LKR",
+        isActive: true,
+      });
+      priceLists.push({
+        service_id: cleaningService._id,
+        price_type: "fixed",
+        fixed_price: 15000,
+        description: "Deep cleaning service for medium homes (3-4 bedrooms) - LKR",
+        isActive: true,
+      });
+    }
+
+    // Plumbing: per unit (per hour)
+    if (plumbingService) {
+      priceLists.push({
+        service_id: plumbingService._id,
+        price_type: "per_unit",
+        unit_price: 8000,
+        unit: "hour",
+        description: "Standard plumbing service rate per hour (LKR)",
+        isActive: true,
+      });
+    }
+
+    // Electrical: fixed price for common jobs
+    if (electricalService) {
+      priceLists.push({
+        service_id: electricalService._id,
+        price_type: "fixed",
+        fixed_price: 12000,
+        description: "Fixed price for standard electrical outlet installation (LKR)",
+        isActive: true,
+      });
+      priceLists.push({
+        service_id: electricalService._id,
+        price_type: "per_unit",
+        unit_price: 9000,
+        unit: "hour",
+        description: "Electrical repair service rate per hour (LKR)",
+        isActive: true,
+      });
+    }
+
+    const createdPriceLists = await PriceList.insertMany(priceLists);
+    console.log(`${createdPriceLists.length} price lists created`);
+    return createdPriceLists;
+  } catch (error) {
+    console.error("Error seeding price lists:", error);
+    throw error;
+  }
+};
 
 // --------------------
 // 3. Seed Function
@@ -588,12 +645,15 @@ async function seedUsers() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB");
 
+    // Clear existing data
     await Provider.deleteMany();
     await Customer.deleteMany();
+    await Service.deleteMany();
+    await PriceList.deleteMany();
 
-    console.log("Old users removed");
+    console.log("Old data removed");
 
-    // Hash password for all
+    // Hash password for all users
     const hashedPassword = await bcrypt.hash("Password123", 10);
 
     const providerData = providers.map((p) => ({
@@ -606,15 +666,32 @@ async function seedUsers() {
       password: hashedPassword,
     }));
 
-    const serviceData = services.map((c) => ({
-      ...c,
-      password: hashedPassword,
-    }));
+    // Insert providers and customers
     await Provider.insertMany(providerData);
     await Customer.insertMany(customerData);
-    await Service.insertMany(serviceData);
+    console.log("Providers and customers seeded");
 
+    // Seed services and price lists
+    const services = await seedServices();
+    const priceLists = await seedPriceLists(services);
+
+    // Summary
+    console.log("=".repeat(50));
+    console.log("Seeding Summary:");
+    console.log("=".repeat(50));
+    console.log(`Providers: ${providerData.length}`);
+    console.log(`Customers: ${customerData.length}`);
+    console.log(`Services: ${services.length}`);
+    console.log(`Price Lists: ${priceLists.length}`);
+    console.log("=".repeat(50));
     console.log("Seed successfully completed");
+    console.log("");
+    console.log("Example Price Lists:");
+    console.log(" - Painting: Rs. 250-300 per square foot");
+    console.log(" - Gardening: Rs. 5,000-15,000 (basic) or Rs. 20,000-50,000 (landscaping)");
+    console.log(" - Cleaning: Rs. 10,000-15,000 fixed price");
+    console.log("");
+
     process.exit();
   } catch (error) {
     console.error("Seed failed", error);
