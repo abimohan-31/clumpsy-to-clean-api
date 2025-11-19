@@ -1282,7 +1282,9 @@ const seedJobPosts = async (customers, services) => {
     const approvedJobPosts = createdJobPosts.filter(
       (jp) => jp.status === "Approved"
     );
-    const allProviders = await Provider.find({ isApproved: true }).select("_id");
+    const allProviders = await Provider.find({ isApproved: true }).select(
+      "_id"
+    );
 
     // Add random applications to some approved jobs
     for (let i = 0; i < Math.min(10, approvedJobPosts.length); i++) {

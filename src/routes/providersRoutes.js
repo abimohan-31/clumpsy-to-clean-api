@@ -17,8 +17,17 @@ import {
 
 const providersRouter = express.Router();
 
+// Public routes (no authentication required)
+providersRouter.get("/public", getAllProviders);
+providersRouter.get("/public/:id", getProviderById);
+
 // Route that requires authentication but NOT approval (for checking status)
-providersRouter.get("/check-approval", checkApprovalStatus);
+providersRouter.get(
+  "/check-approval",
+  verifyToken,
+  verifyRole("provider"),
+  checkApprovalStatus
+);
 
 // Protected routes (require authentication, provider role, and approval)
 providersRouter.use(verifyToken);
