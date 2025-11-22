@@ -3,19 +3,7 @@ import { verifyToken, verifyRole } from "../middleware/authMiddleware.js";
 import {
   getProfile,
   updateProfile,
-  getAllProviders,
-  getProviderById,
 } from "../controllers/customersController.js";
-import {
-  createReview,
-  deleteReview,
-  updateReview,
-} from "../controllers/reviewsController.js";
-import {
-  getAllServices,
-  getProvidersByService,
-  getServiceById,
-} from "../controllers/servicesController.js";
 import {
   getAllJobPosts,
   getJobPostById,
@@ -32,19 +20,50 @@ const customersRouter = express.Router();
 customersRouter.use(verifyToken);
 
 // Profile routes
-customersRouter.get("/profile", getProfile);
-customersRouter.put("/profile", updateProfile);
-
-// Provider viewing routes
-customersRouter.get("/services", getAllServices);
-customersRouter.get("/services/:id", getServiceById);
-customersRouter.get("/services/:id/providers", getProvidersByService);
+customersRouter.get(
+  "/profile",
+  verifyToken,
+  verifyRole("customer"),
+  getProfile
+);
+customersRouter.put(
+  "/profile",
+  verifyToken,
+  verifyRole("customer"),
+  updateProfile
+);
 
 // Job Posts routes (customer-owned)
-customersRouter.get("/job-posts", getAllJobPosts); // Customers see their own, providers/admin see all
-customersRouter.get("/job-posts/:id", getJobPostById);
-customersRouter.post("/job-posts", verifyRole("customer"), createJobPost);
-customersRouter.put("/job-posts/:id", updateJobPost); // Customer (own) or Admin (any)
+customersRouter.get(
+  "/job-posts",
+  verifyToken,
+  verifyRole(["customer", "provider", "admin"]),
+  getAllJobPosts
+); // Customers see their own, providers/admin see all
+customersRouter.get(
+  "/job-posts/:id",
+  verifyToken,
+  verifyRole("customer", "provider"),
+  getJobPostById
+);
+customersRouter.post(
+  "/job-posts",
+  verifyToken,
+  verifyRole("customer"),
+  getJobPostById
+);
+customersRouter.post(
+  "/job-posts",
+  verifyToken,
+  verifyRole("customer"),
+  createJobPost
+);
+customersRouter.put(
+  "/job-posts/:id",
+  verifyToken,
+  verifyRole("customer"),
+  updateJobPost
+); // Customer (own) or Admin (any)
 customersRouter.put(
   "/job-posts/:id/applications/:applicationId/approve",
   verifyRole("customer"),
