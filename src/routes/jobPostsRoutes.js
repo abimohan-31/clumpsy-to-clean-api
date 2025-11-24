@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyRole, verifyToken } from "../middleware/authMiddleware";
+import { verifyRole, verifyToken } from "../middleware/authMiddleware.js";
 import {
   approveApplication,
   createJobPost,
@@ -8,7 +8,7 @@ import {
   getJobPostById,
   rejectApplication,
   updateJobPost,
-} from "../controllers/jobPostsController";
+} from "../controllers/jobPostsController.js";
 const jobPostsRouter = express.Router();
 
 // Job Posts routes (customer-owned)
