@@ -11,6 +11,9 @@ import {
   getSubscription,
   getAllProviders,
   getProviderById,
+  getAllProvidersForAdmin,
+  approveProvider,
+  deleteProvider,
 } from "../controllers/providersController.js";
 import { applyToJobPost } from "../controllers/jobPostsController.js";
 
@@ -23,6 +26,11 @@ providersRouter.get("/public/:id", getProviderById);
 // Route to check approval status by provider ID (public - no authentication required)
 // Allows providers to check their approval status before they can log in
 providersRouter.get("/check-approval/:id", checkApprovalStatus);
+
+// Admin routes (require authentication and admin role)
+providersRouter.get("/admin/all", verifyToken, verifyRole("admin"), getAllProvidersForAdmin);
+providersRouter.put("/:id/approve", verifyToken, verifyRole("admin"), approveProvider);
+providersRouter.delete("/:id", verifyToken, verifyRole("admin"), deleteProvider);
 
 // Protected routes (require authentication, provider role, and approval)
 providersRouter.use(verifyToken);

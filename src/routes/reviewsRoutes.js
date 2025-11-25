@@ -16,7 +16,7 @@ reviewsRouter.get("/", getAllReviews);
 reviewsRouter.get("/:id", getReviewById);
 
 //customer
-reviewsRouter.post("/", verifyToken, verifyRole("customer"), createReview);
+reviewsRouter.post("/",verifyToken, verifyRole("customer"), createReview);
 reviewsRouter.put("/:id", verifyToken, verifyRole("customer"), updateReview);
 reviewsRouter.delete("/:id", verifyToken, verifyRole("customer"), deleteReview);
 

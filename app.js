@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 });
 
 // Connect MongoDB
-connectDB();
+// Connect MongoDB - Moved to startServer
 
 // API Routes
 app.use("/api/users", usersRouter);
@@ -46,7 +46,18 @@ app.use(notFound);
 app.use(defaultError);
 
 // Connect Server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Connect Server
+const startServer = async () => {
+  try {
+    await connectDB();
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+startServer();

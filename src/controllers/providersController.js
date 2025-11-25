@@ -265,3 +265,101 @@ export const getProviderById = async (req, res, next) => {
     next(error);
   }
 };
+
+// GET /api/providers/admin/all - Get all providers for admin (including pending)
+export const getAllProvidersForAdmin = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 100, q = "" } = req.query;
+
+    const filter = {
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
+      ],
+    };
+    
+    const providers = await Provider.find(filter)
+      .select("-password")
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await Provider.countDocuments(filter);
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      data: providers,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT /api/providers/:id/approve - Approve a provider (admin only)
+export const approveProvider = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const provider = await Provider.findById(id);
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Provider not found",
+      });
+    }
+
+    provider.isApproved = true;
+    await provider.save();
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Provider approved successfully",
+      data: {
+        provider: {
+          _id: provider._id,
+          name: provider.name,
+          email: provider.email,
+          isApproved: provider.isApproved,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE /api/providers/:id - Delete/reject a provider (admin only)
+export const deleteProvider = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const provider = await Provider.findByIdAndDelete(id);
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Provider not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Provider deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};

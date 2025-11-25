@@ -79,6 +79,7 @@ export const register = async (req, res, next) => {
       const customer = new Customer({
         name,
         email,
+        phone,
         password,
         role: "customer",
       });
