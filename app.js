@@ -16,7 +16,15 @@ import jobPostsRouter from "./src/routes/jobPostsRoutes.js";
 // Initialize express
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Your frontend URL
+    credentials: true, // Allow cookies/auth headers
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
 
 // Test if the server is working or not
 app.get("/", (req, res) => {
