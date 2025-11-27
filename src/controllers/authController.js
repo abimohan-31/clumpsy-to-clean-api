@@ -97,7 +97,6 @@ export const register = async (req, res, next) => {
         message: "You registered successfully",
         data: {
           user: customerData,
-          token,
         },
       });
     }
