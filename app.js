@@ -12,6 +12,7 @@ import servicesRouter from "./src/routes/servicesRoutes.js";
 import priceListRouter from "./src/routes/priceListRoutes.js";
 import usersRouter from "./src/routes/authRoutes.js";
 import jobPostsRouter from "./src/routes/jobPostsRoutes.js";
+import adminRouter from "./src/routes/adminRoutes.js";
 
 // Initialize express
 const app = express();
@@ -39,6 +40,7 @@ app.get("/", (req, res) => {
 
 // API Routes
 app.use("/api/users", usersRouter);
+app.use("/api/admins", adminRouter);
 app.use("/api/customers", customersRouter);
 app.use("/api/providers", providersRouter);
 app.use("/api/subscriptions", subscriptionsRouter);
