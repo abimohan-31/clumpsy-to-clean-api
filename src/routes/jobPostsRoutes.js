@@ -1,6 +1,7 @@
 import express from "express";
 import { verifyRole, verifyToken } from "../middleware/authMiddleware.js";
 import {
+  applyToJobPost,
   approveApplication,
   createJobPost,
   deleteJobPost,
@@ -22,12 +23,6 @@ jobPostsRouter.get(
   "/job-posts/:id",
   verifyToken,
   verifyRole("customer", "provider"),
-  getJobPostById
-);
-jobPostsRouter.post(
-  "/job-posts",
-  verifyToken,
-  verifyRole("customer"),
   getJobPostById
 );
 jobPostsRouter.post(
@@ -60,5 +55,13 @@ jobPostsRouter.delete(
   verifyRole("customer"),
   deleteJobPost
 ); // Customer (own) or Admin (any)
+
+// Job Post application route
+jobPostsRouter.post(
+  "/job-posts/:id/apply",
+  verifyToken,
+  verifyRole("provider"),
+  applyToJobPost
+);
 
 export default jobPostsRouter;

@@ -10,9 +10,7 @@ import {
   updateProfile,
   getAllProviders,
   getProviderById,
- 
 } from "../controllers/providersController.js";
-import { applyToJobPost } from "../controllers/jobPostsController.js";
 
 const providersRouter = express.Router();
 
@@ -25,15 +23,20 @@ providersRouter.get("/public/:id", getProviderById);
 providersRouter.get("/check-approval/:id", checkApprovalStatus);
 
 // Protected routes (require authentication, provider role, and approval)
-providersRouter.use(verifyToken);
-providersRouter.use(verifyRole("provider"));
 providersRouter.use(verifyProviderApproval);
 
 // Profile routes (no subscription required)
-providersRouter.get("/profile", getProfile);
-providersRouter.put("/profile", updateProfile);
-
-// Job Post application route
-providersRouter.post("/job-posts/:id/apply", applyToJobPost);
+providersRouter.get(
+  "/profile",
+  verifyToken,
+  verifyRole("provider"),
+  getProfile
+);
+providersRouter.put(
+  "/profile",
+  verifyToken,
+  verifyRole("provider"),
+  updateProfile
+);
 
 export default providersRouter;
