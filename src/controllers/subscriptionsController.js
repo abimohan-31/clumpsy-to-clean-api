@@ -12,15 +12,13 @@ export const getAllSubscriptions = async (req, res, next) => {
 
     // Role-based filtering
     if (req.user.role === "provider") {
-      // Providers can only see their own subscriptions
       defaultFilters.provider_id = req.user.id;
     }
-    // Admin sees all (no default filter)
 
     const { data, pagination } = await queryHelper(
       Subscription,
       req.query,
-      ["plan_name"], // Search fields
+      ["plan_name"], 
       {
         defaultFilters,
         populate: {

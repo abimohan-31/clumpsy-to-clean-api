@@ -17,7 +17,7 @@ export const getAllServices = async (req, res, next) => {
     const { data, pagination } = await queryHelper(
       Service,
       req.query,
-      ["name", "description", "category"], // Search fields
+      ["name", "description", "category"], 
       {
         defaultFilters,
       }
@@ -59,8 +59,8 @@ export const getServicesByCategory = async (req, res, next) => {
 
     const { data, pagination } = await queryHelper(
       Service,
-      { ...req.query, category }, // Include category in query params
-      ["name", "description"], // Search fields
+      { ...req.query, category }, 
+      ["name", "description"], 
       {
         defaultFilters: { isActive: true },
       }
@@ -99,7 +99,7 @@ export const getServiceById = async (req, res, next) => {
     // Get providers offering this service (for finding related reviews)
     const skillRegex = new RegExp(service.name, "i");
     const providers = await Provider.find({
-      skills: skillRegex, // Match any skill in the array
+      skills: skillRegex, 
       isApproved: true,
     }).select("_id");
 
@@ -109,11 +109,11 @@ export const getServiceById = async (req, res, next) => {
     const reviews = await Review.find({
       provider_id: { $in: providerIds },
     })
-      .populate("customer_id", "name") // Only name, no email or personal data
-      .populate("provider_id", "name skills") // Only name and skills, no personal data
+      .populate("customer_id", "name") 
+      .populate("provider_id", "name skills") 
       .select("-customer_id.email -provider_id.email -provider_id.phone -provider_id.address")
       .sort({ review_date: -1 })
-      .limit(10); // Limit to recent 10 reviews
+      .limit(25); 
 
     // Calculate average rating for this service
     const avgRatingResult = await Review.aggregate([
@@ -133,7 +133,6 @@ export const getServiceById = async (req, res, next) => {
     // Anonymize reviews for public view (remove sensitive provider data)
     const anonymizedReviews = reviews.map((review) => {
       const reviewObj = review.toObject();
-      // Keep only provider name and skills, remove other personal info
       if (reviewObj.provider_id) {
         reviewObj.provider_id = {
           _id: reviewObj.provider_id._id,
@@ -193,17 +192,17 @@ export const getProvidersByService = async (req, res, next) => {
     // Use queryHelper with custom filter for skills matching
     const queryParams = { ...req.query };
     const defaultFilters = {
-      isApproved: true, // Only show approved providers
-      skills: skillRegex, // Match any skill in the array that matches the service name
+      isApproved: true, 
+      skills: skillRegex, 
     };
 
     const { data: providers, pagination } = await queryHelper(
       Provider,
       queryParams,
-      ["name", "email", "address"], // Search fields
+      ["name", "email", "address"], 
       {
         defaultFilters,
-        select: "-password", // Exclude password
+        select: "-password", 
       }
     );
 

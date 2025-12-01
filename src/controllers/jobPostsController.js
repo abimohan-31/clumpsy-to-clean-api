@@ -17,15 +17,13 @@ export const getAllJobPosts = async (req, res, next) => {
 
     // Role-based filtering
     if (req.user.role === "customer") {
-      // Customers can only see their own posts
       defaultFilters.customerId = req.user.id;
     }
-    // Providers and Admin see all (no default filter)
 
     const { data, pagination } = await queryHelper(
       JobPost,
       req.query,
-      ["title", "description", "location", "duration"], // Search fields
+      ["title", "description", "location", "duration"], 
       {
         defaultFilters,
         populate: [
@@ -71,7 +69,6 @@ export const getJobPostById = async (req, res, next) => {
 
     // Access control
     if (req.user.role === "customer") {
-      // Customer can only see their own posts
       if (jobPost.customerId._id.toString() !== req.user.id) {
         return res.status(403).json({
           success: false,
@@ -80,7 +77,6 @@ export const getJobPostById = async (req, res, next) => {
         });
       }
     }
-    // Providers and Admin can see all job posts
 
     return res.status(200).json({
       success: true,
@@ -186,7 +182,7 @@ export const createJobPost = async (req, res, next) => {
       service_id,
       location,
       customerId: req.user.id,
-      applications: [], // Initialize empty applications array
+      applications: [], 
     });
 
     await jobPost.save();

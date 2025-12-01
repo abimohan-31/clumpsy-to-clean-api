@@ -160,7 +160,7 @@ export const getSubscription = async (req, res, next) => {
 // GET /api/providers/reviews - Get provider reviews
 export const getReviews = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5, q = "" } = req.query;
+    const { page = 1, limit = 25, q = "" } = req.query;
 
     const filter = {
       isActive: true,
@@ -200,7 +200,7 @@ export const getReviews = async (req, res, next) => {
 // GET /api/providers/public - Get all approved providers (public route)
 export const getAllProviders = async (req, res, next) => {
   try {
-    const { page = 1, limit = 5, q = "" } = req.query;
+    const { page = 1, limit = 25, q = "" } = req.query;
 
     const filter = {
       isApproved: true,
@@ -269,7 +269,7 @@ export const getProviderById = async (req, res, next) => {
 // GET /api/providers/admin/all - Get all providers for admin (including pending)
 export const getAllProvidersForAdmin = async (req, res, next) => {
   try {
-    const { page = 1, limit = 100, q = "" } = req.query;
+    const { page = 1, limit = 25, q = "" } = req.query;
 
     const filter = {
       $or: [

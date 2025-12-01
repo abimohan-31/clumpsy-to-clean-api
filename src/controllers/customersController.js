@@ -67,7 +67,7 @@ export const updateProfile = async (req, res, next) => {
 export const getAllProviders = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 25;
     const { skill, availability_status } = req.query;
 
     // Build query

@@ -131,7 +131,6 @@ export const createReview = async (req, res, next) => {
 
     // Determine IDs based on user role
     if (req.user.role === "customer") {
-      // Customers review providers - customer_id comes from logged-in user, provider_id from body
       if (!provider_id) {
         return res.status(400).json({
           success: false,
@@ -142,9 +141,8 @@ export const createReview = async (req, res, next) => {
           ],
         });
       }
-      finalCustomerId = req.user.id; // Customer ID is automatically set from logged-in user
+      finalCustomerId = req.user.id; 
     } else if (req.user.role === "provider") {
-      // Providers can create reviews about customers - provider_id comes from logged-in user, customer_id from body
       if (!customer_id) {
         return res.status(400).json({
           success: false,
@@ -155,7 +153,7 @@ export const createReview = async (req, res, next) => {
           ],
         });
       }
-      finalProviderId = req.user.id; // Provider ID is automatically set from logged-in user
+      finalProviderId = req.user.id; 
     }
 
     if (!rating) {
