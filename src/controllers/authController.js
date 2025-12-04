@@ -670,3 +670,43 @@ export const createUser = async (req, res, next) => {
     next(error);
   }
 };
+
+// GET /api/users/admins - Get all admins (admin only)
+export const getAllAdmins = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 25, q = "" } = req.query;
+
+    const filter = {
+      isActive: true,
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
+      ],
+    };
+    const admins = await User.find({ role: "admin" }, filter)
+      .select("-password")
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await User.countDocuments({ role: "admin" });
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Fetch all admins successfully",
+      data: {
+        admins,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

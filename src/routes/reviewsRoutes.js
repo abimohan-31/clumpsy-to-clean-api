@@ -18,7 +18,7 @@ reviewsRouter.get("/:id", getReviewById);
 //customer
 reviewsRouter.post("/",verifyToken, verifyRole("customer"), createReview);
 reviewsRouter.put("/:id", verifyToken, verifyRole("customer"), updateReview);
-reviewsRouter.delete("/:id", verifyToken, verifyRole("customer"), deleteReview);
+reviewsRouter.delete("/:id", verifyToken, deleteReview); // Controller handles permission (admin or owner)
 
 //provider
 reviewsRouter.get("/", verifyToken, verifyRole("provider"), getReviews);

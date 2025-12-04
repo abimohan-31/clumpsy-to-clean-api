@@ -49,6 +49,38 @@ const providerSchema = new mongoose.Schema(
       max: 5,
       default: 0,
     },
+    profileImage: {
+      type: String,
+      default: null,
+    },
+    workImages: [
+      {
+        title: {
+          type: String,
+          required: true,
+        },
+        description: {
+          type: String,
+          default: "",
+        },
+        beforeImage: {
+          type: String,
+          required: true,
+        },
+        afterImage: {
+          type: String,
+          required: true,
+        },
+        category: {
+          type: String,
+          default: "",
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     role: {
       type: String,
       enum: ["admin", "provider", "customer"],

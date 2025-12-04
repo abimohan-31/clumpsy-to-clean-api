@@ -1,6 +1,7 @@
 import express from "express";
 import connectDB from "./src/config/db.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { defaultError, notFound } from "./src/middleware/ErrorHandlers.js";
 
 // Import route groups
@@ -12,11 +13,11 @@ import servicesRouter from "./src/routes/servicesRoutes.js";
 import priceListRouter from "./src/routes/priceListRoutes.js";
 import usersRouter from "./src/routes/authRoutes.js";
 import jobPostsRouter from "./src/routes/jobPostsRoutes.js";
-import adminRouter from "./src/routes/adminRoutes.js";
 
 // Initialize express
 const app = express();
 app.use(express.json());
+app.use(cookieParser()); // Parse cookies from requests
 
 // CORS configuration
 app.use(
@@ -40,7 +41,6 @@ app.get("/", (req, res) => {
 
 // API Routes
 app.use("/api/users", usersRouter);
-app.use("/api/admins", adminRouter);
 app.use("/api/customers", customersRouter);
 app.use("/api/providers", providersRouter);
 app.use("/api/subscriptions", subscriptionsRouter);

@@ -7,7 +7,13 @@ import TokenBlacklist from "../models/TokenBlacklist.js";
 // Verify JWT token middleware
 export const verifyToken = async (req, res, next) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    // Try to get token from cookie first (preferred method)
+    let token = req.cookies?.access_token;
+    
+    // Fallback to Authorization header if no cookie
+    if (!token) {
+      token = req.header("Authorization")?.replace("Bearer ", "");
+    }
 
     if (!token) {
       return res.status(401).json({
