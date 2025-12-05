@@ -4,6 +4,51 @@ import Review from "../models/Review.js";
 import PriceList from "../models/PriceList.js";
 import { queryHelper } from "../utils/queryHelper.js";
 
+// GET /api/services/with-providers - Get all services with their providers (for customers)
+export const getAllServicesWithProviders = async (req, res, next) => {
+  try {
+    const services = await Service.find({ isActive: true }).sort({ name: 1 });
+    
+    const servicesWithProviders = await Promise.all(
+      services.map(async (service) => {
+        const skillRegex = new RegExp(service.name, "i");
+        const providers = await Provider.find({
+          isApproved: true,
+          skills: skillRegex,
+        })
+          .select("-password")
+          .limit(10);
+
+        return {
+          ...service.toObject(),
+          providers: providers.map((p) => ({
+            _id: p._id,
+            name: p.name,
+            phone: p.phone,
+            email: p.email,
+            address: p.address,
+            experience_years: p.experience_years,
+            skills: p.skills,
+            availability_status: p.availability_status,
+            rating: p.rating,
+            profileImage: p.profileImage,
+          })),
+        };
+      })
+    );
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      data: {
+        services: servicesWithProviders,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // GET /api/services - Get all services (public route)
 // Supports search, filter, sort, and pagination
 // Admin users (if authenticated) can see all services including inactive
