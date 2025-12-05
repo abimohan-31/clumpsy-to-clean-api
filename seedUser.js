@@ -30,24 +30,10 @@ const seedProviders = async () => {
   ];
 
   const locations = [
-    "Colombo",
-    "Gampaha",
-    "Kandy",
-    "Negombo",
-    "Matara",
-    "Kurunegala",
-    "Ratnapura",
+   
+    "Killinochchi",
     "Jaffna",
-    "Anuradhapura",
-    "Kegalle",
-    "Galle",
-    "Matale",
-    "Trincomalee",
-    "Badulla",
-    "Hambantota",
-    "Nuwara Eliya",
-    "Polonnaruwa",
-    "Batticaloa",
+    "Mullaitivu",
     "Mannar",
     "Vavuniya",
   ];
