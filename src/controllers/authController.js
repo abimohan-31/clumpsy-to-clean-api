@@ -202,11 +202,6 @@ export const login = async (req, res, next) => {
   try {
     const { email, password, role } = req.body;
 
-    console.log("=== LOGIN ATTEMPT ===");
-    console.log("Email:", email);
-    console.log("Role:", role);
-    console.log("Password provided:", password ? "Yes" : "No");
-
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -310,10 +305,10 @@ export const login = async (req, res, next) => {
     delete userData.password;
 
     // STORE TOKEN IN COOKIE
-    res.cookie("access_token", token, {
+    res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
