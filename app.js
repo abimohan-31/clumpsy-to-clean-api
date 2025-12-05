@@ -23,7 +23,12 @@ app.use(cookieParser()); // Parse cookies from requests
 // CORS configuration
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: [
+      "http://localhost:3000",
+      "https://workbond.vercel.app",
+      "https://workbond-git-main.vercel.app",
+      /\.vercel\.app$/, // Allow all Vercel preview deployments
+    ],
     credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
