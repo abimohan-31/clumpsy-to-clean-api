@@ -78,19 +78,22 @@ providersRouter.delete(
 );
 
 // Protected routes (require authentication, provider role, and approval)
-providersRouter.use(verifyProviderApproval);
+// Protected routes (require authentication, provider role, and approval)
+// providersRouter.use(verifyProviderApproval); // REMOVED: Caused 401 because it ran before verifyToken
 
 // Profile routes (no subscription required)
 providersRouter.get(
   "/profile",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   getProfile
 );
 providersRouter.put(
   "/profile",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   updateProfile
 );
 
@@ -99,12 +102,14 @@ providersRouter.patch(
   "/profile/image",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   updateProfileImage
 );
 providersRouter.delete(
   "/profile/image",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   deleteProfileImage
 );
 
@@ -113,30 +118,35 @@ providersRouter.post(
   "/work-images",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   createWorkImage
 );
 providersRouter.get(
   "/work-images",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   getAllWorkImages
 );
 providersRouter.get(
   "/work-images/:id",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   getWorkImageById
 );
 providersRouter.put(
   "/work-images/:id",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   updateWorkImage
 );
 providersRouter.delete(
   "/work-images/:id",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   deleteWorkImage
 );
 
@@ -146,6 +156,7 @@ providersRouter.post(
   "/work-entries",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   createWorkEntryAfterCompletion
 );
 
@@ -154,6 +165,7 @@ providersRouter.get(
   "/work-entries",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   getAllWorkEntries
 );
 
@@ -162,6 +174,7 @@ providersRouter.get(
   "/work-entries/from-jobs",
   verifyToken,
   verifyRole("provider"),
+  verifyProviderApproval,
   getWorkEntriesFromCompletedJobs
 );
 

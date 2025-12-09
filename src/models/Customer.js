@@ -38,7 +38,7 @@ const customerSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["admin", "provider", "customer"],
+      enum: ["customer"],
       default: "customer",
     },
     isActive: {

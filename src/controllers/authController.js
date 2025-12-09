@@ -318,9 +318,9 @@ export const login = async (req, res, next) => {
       statusCode: 200,
       message: "Login successful",
       data: {
-        user: userData,
+        user: { ...userData, role: userData.role || role },
         token,
-        role: user.role,
+        role: user.role || role,
       },
     });
   } catch (error) {
@@ -423,7 +423,7 @@ export const getUserById = async (req, res, next) => {
       success: true,
       statusCode: 200,
       data: {
-        user,
+        user: { ...user.toObject(), role: user.role || role },
       },
     });
   } catch (error) {

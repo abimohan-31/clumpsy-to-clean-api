@@ -15,51 +15,27 @@ const customersRouter = express.Router();
 // All routes require authentication
 customersRouter.use(verifyToken);
 
-// Admin routes
-customersRouter.get(
-  "/",
-  verifyRole("admin"),
-  getAllCustomers
-);
-
-customersRouter.get(
-  "/:id",
-  verifyRole("admin"),
-  getCustomerById
-);
-
-customersRouter.delete(
-  "/:id",
-  verifyRole("admin"),
-  deleteCustomer
-);
-
-// Profile routes
-customersRouter.get(
-  "/profile",
-  verifyToken,
-  verifyRole("customer"),
-  getProfile
-);
-customersRouter.put(
-  "/profile",
-  verifyToken,
-  verifyRole("customer"),
-  updateProfile
-);
+// Profile routes - MUST be defined before /:id routes to avoid route conflicts
+customersRouter.get("/profile", verifyRole("customer"), getProfile);
+customersRouter.put("/profile", verifyRole("customer"), updateProfile);
 
 // Profile image routes
 customersRouter.patch(
   "/profile/image",
-  verifyToken,
   verifyRole("customer"),
   updateProfileImage
 );
 customersRouter.delete(
   "/profile/image",
-  verifyToken,
   verifyRole("customer"),
   deleteProfileImage
 );
+
+// Admin routes
+customersRouter.get("/", verifyRole("admin"), getAllCustomers);
+
+customersRouter.get("/:id", verifyRole("admin"), getCustomerById);
+
+customersRouter.delete("/:id", verifyRole("admin"), deleteCustomer);
 
 export default customersRouter;

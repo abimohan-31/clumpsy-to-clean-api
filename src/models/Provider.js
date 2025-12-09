@@ -43,12 +43,6 @@ const providerSchema = new mongoose.Schema(
       enum: ["Available", "Unavailable"],
       default: "Available",
     },
-    rating: {
-      type: Number,
-      min: 0,
-      max: 5,
-      default: 0,
-    },
     profileImage: {
       type: String,
       default: null,
@@ -109,6 +103,11 @@ const providerSchema = new mongoose.Schema(
     isApproved: {
       type: Boolean,
       default: false,
+    },
+    role: {
+      type: String,
+      enum: ["provider"],
+      default: "provider",
     },
   },
   {
