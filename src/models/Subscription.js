@@ -36,6 +36,23 @@ const subscriptionSchema = new mongoose.Schema(
       required: [true, "Subscription amount is required"],
       min: [0, "Amount cannot be negative"],
     },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "pending",
+    },
+    stripePaymentIntentId: {
+      type: String,
+      default: null,
+    },
+    stripeCheckoutSessionId: {
+      type: String,
+      default: null,
+    },
+    paidAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

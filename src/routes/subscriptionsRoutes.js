@@ -21,6 +21,13 @@ subscriptionsRouter.get("/:id", verifyRole("admin", "provider"), getSubscription
 
 // POST, PUT, DELETE routes (admin only)
 subscriptionsRouter.post("/", verifyRole("admin"), createSubscription);
+
+// Provider self-subscription route
+subscriptionsRouter.post("/provider/subscribe", verifyRole("provider"), async (req, res, next) => {
+  const { createProviderSubscription } = await import("../controllers/subscriptionsController.js");
+  return createProviderSubscription(req, res, next);
+});
+
 subscriptionsRouter.put("/:id", verifyRole("admin"), updateSubscription);
 subscriptionsRouter.delete("/:id", verifyRole("admin"), deleteSubscription);
 

@@ -14,6 +14,7 @@ import priceListRouter from "./src/routes/priceListRoutes.js";
 import usersRouter from "./src/routes/authRoutes.js";
 import jobPostsRouter from "./src/routes/jobPostsRoutes.js";
 import workPostsRouter from "./src/routes/workPostsRoutes.js";
+import paymentsRouter from "./src/routes/paymentsRoutes.js";
 
 // Initialize express
 const app = express();
@@ -56,6 +57,7 @@ app.use("/api/services", servicesRouter);
 app.use("/api/price-list", priceListRouter);
 app.use("/api/jobposts", jobPostsRouter);
 app.use("/api/workposts", workPostsRouter);
+app.use("/api/payments", paymentsRouter);
 
 // Page not found
 app.use(notFound);

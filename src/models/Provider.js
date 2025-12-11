@@ -109,6 +109,15 @@ const providerSchema = new mongoose.Schema(
       enum: ["provider"],
       default: "provider",
     },
+    stripeCustomerId: {
+      type: String,
+      default: null,
+    },
+    currentSubscriptionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subscription",
+      default: null,
+    },
   },
   {
     timestamps: true,

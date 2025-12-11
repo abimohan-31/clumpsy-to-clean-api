@@ -142,9 +142,17 @@ export const createSubscription = async (req, res, next) => {
       renewal_date,
       status: status || "Active",
       amount,
+      paymentStatus: amount > 0 ? "pending" : "paid",
+      paidAt: amount === 0 ? new Date() : null,
     });
 
     await subscription.save();
+
+    if (amount === 0) {
+      await Provider.findByIdAndUpdate(provider_id, {
+        currentSubscriptionId: subscription._id,
+      });
+    }
 
     const populatedSubscription = await Subscription.findById(
       subscription._id
@@ -153,7 +161,9 @@ export const createSubscription = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       statusCode: 201,
-      message: "Subscription created successfully",
+      message: amount > 0 
+        ? "Subscription created successfully. Provider needs to complete payment."
+        : "Free subscription created and activated successfully.",
       data: {
         subscription: populatedSubscription,
       },
@@ -176,7 +186,7 @@ export const createSubscription = async (req, res, next) => {
 export const updateSubscription = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { plan_name, start_date, end_date, renewal_date, status, amount } = req.body;
+    const { status, plan_name, end_date, amount, paymentStatus } = req.body;
 
     const subscription = await Subscription.findById(id);
 
@@ -188,32 +198,41 @@ export const updateSubscription = async (req, res, next) => {
       });
     }
 
-    // Update fields
+    if (status) {
+      const validStatuses = ["Active", "Cancelled", "Expired"];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          message: "Invalid status. Must be Active, Cancelled, or Expired",
+        });
+      }
+      subscription.status = status;
+    }
+
     if (plan_name) subscription.plan_name = plan_name;
-    if (start_date) subscription.start_date = start_date;
     if (end_date) subscription.end_date = end_date;
-    if (renewal_date !== undefined) subscription.renewal_date = renewal_date;
-    if (status) subscription.status = status;
     if (amount !== undefined) subscription.amount = amount;
+    if (paymentStatus) subscription.paymentStatus = paymentStatus;
 
     await subscription.save();
 
-    const populatedSubscription = await Subscription.findById(
-      subscription._id
-    ).populate("provider_id", "name email");
+    const updatedSubscription = await Subscription.findById(id).populate(
+      "provider_id",
+      "name email"
+    );
 
     return res.status(200).json({
       success: true,
       statusCode: 200,
       message: "Subscription updated successfully",
-      data: {
-        subscription: populatedSubscription,
-      },
+      data: updatedSubscription,
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 // DELETE /api/subscriptions/:id - Delete subscription (admin only)
 export const deleteSubscription = async (req, res, next) => {
@@ -236,6 +255,91 @@ export const deleteSubscription = async (req, res, next) => {
       message: "Subscription deleted successfully",
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const createProviderSubscription = async (req, res, next) => {
+  try {
+    const { plan_name, start_date, end_date, amount } = req.body;
+
+    if (!plan_name) {
+      return res.status(400).json({
+        success: false,
+        statusCode: 400,
+        message: "Plan name is required",
+        errors: [{ field: "plan_name", message: "Plan name is required" }],
+      });
+    }
+
+    if (!end_date) {
+      return res.status(400).json({
+        success: false,
+        statusCode: 400,
+        message: "End date is required",
+        errors: [{ field: "end_date", message: "End date is required" }],
+      });
+    }
+
+    if (amount === undefined || amount === null) {
+      return res.status(400).json({
+        success: false,
+        statusCode: 400,
+        message: "Amount is required",
+        errors: [{ field: "amount", message: "Amount is required" }],
+      });
+    }
+
+    const provider = await Provider.findById(req.user.id);
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Provider not found",
+      });
+    }
+
+    const subscription = new Subscription({
+      provider_id: req.user.id,
+      plan_name,
+      start_date: start_date || new Date(),
+      end_date,
+      status: "Active",
+      amount,
+      paymentStatus: amount > 0 ? "pending" : "paid",
+      paidAt: amount === 0 ? new Date() : null,
+    });
+
+    await subscription.save();
+
+    if (amount === 0) {
+      await Provider.findByIdAndUpdate(req.user.id, {
+        currentSubscriptionId: subscription._id,
+      });
+    }
+
+    const populatedSubscription = await Subscription.findById(
+      subscription._id
+    ).populate("provider_id", "name email");
+
+    return res.status(201).json({
+      success: true,
+      statusCode: 201,
+      message: amount > 0 
+        ? "Subscription created successfully. Please complete payment to activate."
+        : "Free subscription created and activated successfully.",
+      data: populatedSubscription,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({
+        success: false,
+        statusCode: 400,
+        message: `Duplicate key error: ${field} already exists`,
+        errors: [{ field, message: "already exists" }],
+      });
+    }
     next(error);
   }
 };
