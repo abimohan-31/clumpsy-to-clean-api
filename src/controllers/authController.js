@@ -332,7 +332,11 @@ export const login = async (req, res, next) => {
 // POST /api/users/logout - Logout and invalidate token
 export const logout = async (req, res, next) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    let token = req.cookies?.access_token;
+    
+    if (!token) {
+      token = req.header("Authorization")?.replace("Bearer ", "");
+    }
 
     if (!token) {
       return res.status(400).json({
