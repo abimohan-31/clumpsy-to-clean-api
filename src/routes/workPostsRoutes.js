@@ -12,7 +12,6 @@ import {
 
 const workPostsRouter = express.Router();
 
-// Get all work posts - providers see their own, others see public ones
 workPostsRouter.get(
   "/",
   verifyToken,
@@ -20,29 +19,6 @@ workPostsRouter.get(
   getAllWorkPosts
 );
 
-// Get work post by ID
-workPostsRouter.get(
-  "/:id",
-  verifyToken,
-  verifyRole(["customer", "provider", "admin"]),
-  getWorkPostById
-);
-
-// Create work post - provider only
-workPostsRouter.post("/", verifyToken, verifyRole("provider"), createWorkPost);
-
-// Update work post - provider can update their own, admin can update any
-workPostsRouter.put("/:id", verifyToken, verifyRole("provider"), updateWorkPost);
-
-// Delete work post - provider can delete their own, admin can delete any
-workPostsRouter.delete(
-  "/:id",
-  verifyToken,
-  verifyRole("provider"),
-  deleteWorkPost
-);
-
-// Get work posts by provider ID - public endpoint
 workPostsRouter.get(
   "/provider/:providerId",
   verifyToken,
@@ -50,7 +26,6 @@ workPostsRouter.get(
   getWorkPostsByProvider
 );
 
-// Get work posts by job post ID - public endpoint
 workPostsRouter.get(
   "/job/:jobPostId",
   verifyToken,
@@ -58,5 +33,22 @@ workPostsRouter.get(
   getWorkPostsByJobPost
 );
 
-export default workPostsRouter;
+workPostsRouter.get(
+  "/:id",
+  verifyToken,
+  verifyRole(["customer", "provider", "admin"]),
+  getWorkPostById
+);
 
+workPostsRouter.post("/", verifyToken, verifyRole("provider"), createWorkPost);
+
+workPostsRouter.put("/:id", verifyToken, verifyRole("provider"), updateWorkPost);
+
+workPostsRouter.delete(
+  "/:id",
+  verifyToken,
+  verifyRole("provider"),
+  deleteWorkPost
+);
+
+export default workPostsRouter;

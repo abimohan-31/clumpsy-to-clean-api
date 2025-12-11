@@ -5,15 +5,13 @@ import Service from "../models/Service.js";
 import Customer from "../models/Customer.js";
 import { queryHelper } from "../utils/queryHelper.js";
 
-// GET /api/workposts - Get all work posts
-// Providers see their own work posts, others see public ones
 export const getAllWorkPosts = async (req, res, next) => {
   try {
     let defaultFilters = {};
 
     if (req.user.role === "provider") {
       defaultFilters.providerId = req.user.id;
-    } else {
+    } else if (req.user.role !== "admin") {
       defaultFilters.isPublic = true;
     }
 
@@ -42,7 +40,6 @@ export const getAllWorkPosts = async (req, res, next) => {
   }
 };
 
-// GET /api/workposts/:id - Get work post by ID
 export const getWorkPostById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -63,15 +60,14 @@ export const getWorkPostById = async (req, res, next) => {
 
     if (
       !workPost.isPublic &&
-      workPost.providerId._id.toString() !== req.user.id
+      workPost.providerId._id.toString() !== req.user.id &&
+      req.user.role !== "admin"
     ) {
-      if (req.user.role !== "admin") {
-        return res.status(403).json({
-          success: false,
-          statusCode: 403,
-          message: "You do not have permission to view this work post",
-        });
-      }
+      return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message: "You do not have permission to view this work post",
+      });
     }
 
     return res.status(200).json({
@@ -86,7 +82,6 @@ export const getWorkPostById = async (req, res, next) => {
   }
 };
 
-// POST /api/workposts - Create work post (provider only)
 export const createWorkPost = async (req, res, next) => {
   try {
     if (!req.user || req.user.role !== "provider") {
@@ -104,7 +99,6 @@ export const createWorkPost = async (req, res, next) => {
       afterImage,
       category,
       jobPostId,
-      customerFeedback,
       isPublic,
     } = req.body;
 
@@ -141,6 +135,23 @@ export const createWorkPost = async (req, res, next) => {
         success: false,
         statusCode: 404,
         message: "Provider not found",
+      });
+    }
+
+    const Subscription = (await import("../models/Subscription.js")).default;
+    const activeSubscription = await Subscription.findOne({
+      provider_id: req.user.id,
+      status: "Active",
+      paymentStatus: "paid",
+      end_date: { $gt: new Date() },
+    });
+
+    if (!activeSubscription) {
+      return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message: "You need an active paid subscription to create work posts. Please subscribe to continue.",
+        requiresSubscription: true,
       });
     }
 
@@ -188,7 +199,7 @@ export const createWorkPost = async (req, res, next) => {
       service_id: serviceId,
       customerId: customerId,
       completedAt: new Date(),
-      customerFeedback: customerFeedback || "",
+      customerFeedback: req.body.customerFeedback || "",
       isPublic: isPublic !== undefined ? isPublic : true,
     });
 
@@ -213,7 +224,6 @@ export const createWorkPost = async (req, res, next) => {
   }
 };
 
-// PUT /api/workposts/:id - Update work post
 export const updateWorkPost = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -237,14 +247,15 @@ export const updateWorkPost = async (req, res, next) => {
       });
     }
 
-    if (req.user.role !== "admin") {
-      if (workPost.providerId.toString() !== req.user.id) {
-        return res.status(403).json({
-          success: false,
-          statusCode: 403,
-          message: "You can only update your own work posts",
-        });
-      }
+    if (
+      req.user.role !== "admin" &&
+      workPost.providerId.toString() !== req.user.id
+    ) {
+      return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message: "You can only update your own work posts",
+      });
     }
 
     if (title) workPost.title = title;
@@ -277,7 +288,6 @@ export const updateWorkPost = async (req, res, next) => {
   }
 };
 
-// DELETE /api/workposts/:id - Delete work post
 export const deleteWorkPost = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -292,14 +302,15 @@ export const deleteWorkPost = async (req, res, next) => {
       });
     }
 
-    if (req.user.role !== "admin") {
-      if (workPost.providerId.toString() !== req.user.id) {
-        return res.status(403).json({
-          success: false,
-          statusCode: 403,
-          message: "You can only delete your own work posts",
-        });
-      }
+    if (
+      req.user.role !== "admin" &&
+      workPost.providerId.toString() !== req.user.id
+    ) {
+      return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message: "You can only delete your own work posts",
+      });
     }
 
     await WorkPost.findByIdAndDelete(id);
@@ -314,7 +325,6 @@ export const deleteWorkPost = async (req, res, next) => {
   }
 };
 
-// GET /api/workposts/provider/:providerId - Get work posts by provider
 export const getWorkPostsByProvider = async (req, res, next) => {
   try {
     const { providerId } = req.params;
@@ -346,7 +356,6 @@ export const getWorkPostsByProvider = async (req, res, next) => {
   }
 };
 
-// GET /api/workposts/job/:jobPostId - Get work posts by job post
 export const getWorkPostsByJobPost = async (req, res, next) => {
   try {
     const { jobPostId } = req.params;
@@ -376,4 +385,3 @@ export const getWorkPostsByJobPost = async (req, res, next) => {
     next(error);
   }
 };
-
