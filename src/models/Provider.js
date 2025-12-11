@@ -104,6 +104,11 @@ const providerSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    account_status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
     role: {
       type: String,
       enum: ["provider"],

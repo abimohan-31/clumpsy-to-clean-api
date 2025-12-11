@@ -26,6 +26,8 @@ import {
   createWorkEntryAfterCompletion,
   getAllWorkEntries,
   getWorkEntriesFromCompletedJobs,
+  banProvider,
+  activateProvider,
 } from "../controllers/providersController.js";
 
 const providersRouter = express.Router();
@@ -76,6 +78,21 @@ providersRouter.delete(
   verifyRole("admin"),
   deleteProvider
 );
+
+providersRouter.patch(
+  "/:id/ban",
+  verifyToken,
+  verifyRole("admin"),
+  banProvider
+);
+
+providersRouter.patch(
+  "/:id/activate",
+  verifyToken,
+  verifyRole("admin"),
+  activateProvider
+);
+
 
 // Protected routes (require authentication, provider role, and approval)
 // Protected routes (require authentication, provider role, and approval)

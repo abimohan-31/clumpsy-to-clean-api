@@ -57,6 +57,14 @@ export const verifyToken = async (req, res, next) => {
       });
     }
 
+    if ((decoded.role === "provider" || decoded.role === "customer") && user.account_status === "inactive") {
+      return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message: "Your account has been deactivated. Please contact support.",
+      });
+    }
+
     // Attach user details to request
     req.user = {
       id: user._id.toString(),

@@ -8,6 +8,8 @@ import {
   getAllCustomers,
   getCustomerById,
   deleteCustomer,
+  banCustomer,
+  activateCustomer,
 } from "../controllers/customersController.js";
 
 const customersRouter = express.Router();
@@ -37,5 +39,9 @@ customersRouter.get("/", verifyRole("admin"), getAllCustomers);
 customersRouter.get("/:id", verifyRole("admin"), getCustomerById);
 
 customersRouter.delete("/:id", verifyRole("admin"), deleteCustomer);
+
+customersRouter.patch("/:id/ban", verifyRole("admin"), banCustomer);
+
+customersRouter.patch("/:id/activate", verifyRole("admin"), activateCustomer);
 
 export default customersRouter;

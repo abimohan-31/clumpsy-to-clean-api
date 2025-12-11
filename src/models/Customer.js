@@ -36,6 +36,12 @@ const customerSchema = new mongoose.Schema(
       default: null,
     },
 
+    account_status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+
     role: {
       type: String,
       enum: ["customer"],

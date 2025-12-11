@@ -303,3 +303,61 @@ export const deleteCustomer = async (req, res, next) => {
     next(error);
   }
 };
+
+export const banCustomer = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const customer = await Customer.findByIdAndUpdate(
+      id,
+      { account_status: "inactive" },
+      { new: true }
+    ).select("-password");
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Customer not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Customer banned successfully",
+      data: { customer },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const activateCustomer = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const customer = await Customer.findByIdAndUpdate(
+      id,
+      { account_status: "active" },
+      { new: true }
+    ).select("-password");
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Customer not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Customer activated successfully",
+      data: { customer },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

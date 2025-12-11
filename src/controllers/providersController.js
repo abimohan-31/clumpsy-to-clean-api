@@ -368,6 +368,65 @@ export const deleteProvider = async (req, res, next) => {
   }
 };
 
+export const banProvider = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const provider = await Provider.findByIdAndUpdate(
+      id,
+      { account_status: "inactive" },
+      { new: true }
+    ).select("-password");
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Provider not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Provider banned successfully",
+      data: { provider },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const activateProvider = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const provider = await Provider.findByIdAndUpdate(
+      id,
+      { account_status: "active" },
+      { new: true }
+    ).select("-password");
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Provider not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Provider activated successfully",
+      data: { provider },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // PUT /api/providers/:id/reject - Reject a provider (admin only)
 export const rejectProvider = async (req, res, next) => {
   try {
